@@ -39,4 +39,4 @@
         - 1-5점 사이의 평점과 한줄평을 남길 수 있다.
 
 ## ERD
-![스크린샷 2024-08-23 오후 5.59.16.png](..%2F..%2FDesktop%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-08-23%20%EC%98%A4%ED%9B%84%205.59.16.png)
+<img width="873" alt="스크린샷 2024-08-23 오후 5 59 16" src="https://github.com/user-attachments/assets/afe28979-2523-4b3e-8021-070035713cba">
