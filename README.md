@@ -42,5 +42,5 @@
         - 1-5점 사이의 평점과 한줄평을 남길 수 있다.
 
 ## ERD
-![스크린샷 2024-08-24 오전 1 26 37](https://github.com/user-attachments/assets/bdb127e8-6974-4773-8371-73c0377b5ece)
+![스크린샷 2024-08-26 오후 6 01 32](https://github.com/user-attachments/assets/4934ea06-1c88-46dc-b495-27e4e8e44cf9)
 
