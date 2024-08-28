@@ -30,9 +30,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public UserDto register(RegisterUser.Request request) {
-    boolean exists = this.userRepository.existsByEmail(request.getEmail());
-
-    if (exists) {
+    if (this.userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ALREADY_EXISTED_EMAIL);
     }
 
@@ -63,13 +61,10 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    if (this.userRepository.existsByEmail(email)) {
-      User user = checkEmail(email);
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new
+        UsernameNotFoundException("USER not found with email: " + email));
 
-      return createUserDetail(user.getEmail(), user.getPassword(), USER);
-    }
-
-    throw new UsernameNotFoundException("USER not found with email: " + email);
+    return createUserDetail(user.getEmail(), user.getPassword(), USER);
   }
 
   private User checkEmail(String email) {
