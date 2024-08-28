@@ -8,25 +8,34 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+
 public class RegisterUser {
 
-  private String email;
-  private String password;
-  private String username;
-  private LocalDateTime birthday;
-  private String phoneNumber;
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Request {
+    private String email;
+    private String password;
+    private String username;
+    private LocalDateTime birthday;
+    private String phoneNumber;
+  }
 
-  public static UserDto from(UserDto userDto) {
-    return UserDto.builder()
-        .email(userDto.getEmail())
-        .password(userDto.getPassword())
-        .username(userDto.getUsername())
-        .birthday(userDto.getBirthday())
-        .phoneNumber(userDto.getPhoneNumber())
-        .build();
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Response {
+    private String email;
+    private String username;
+
+    public static Response from(UserDto userDto) {
+      return Response.builder()
+          .email(userDto.getEmail())
+          .username(userDto.getUsername())
+          .build();
+    }
   }
 }
