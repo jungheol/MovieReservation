@@ -2,7 +2,7 @@ package com.zerobase.moviereservation.model.dto;
 
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.model.type.Role;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class UserDto {
   private String email;
   private String password;
   private String username;
-  private LocalDateTime birthday;
+  private LocalDate birthday;
   private String phoneNumber;
   private Role role;
 

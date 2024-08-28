@@ -10,9 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,7 +37,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
   private String username;
 
-  private LocalDateTime birthday;
+  private LocalDate birthday;
 
   private String phoneNumber;
 
