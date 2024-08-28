@@ -50,6 +50,16 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     return UserDto.fromEntity(user);
   }
 
+  public User login(Login.Request request) {
+    User user = checkEmail(request.getEmail());
+
+    if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      throw new CustomException(PASSWORD_NOT_MATCHED);
+    }
+
+    return user;
+  }
+
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

@@ -11,4 +11,7 @@ public interface AuthService {
   UserDetails loadUserByUsername(String email);
 
   UserDto register(RegisterUser.Request request);
+
+  User login(Login.Request request);
+
 }
