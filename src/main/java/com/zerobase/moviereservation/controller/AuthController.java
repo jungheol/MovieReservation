@@ -1,9 +1,9 @@
 package com.zerobase.moviereservation.controller;
 
 import com.zerobase.moviereservation.auth.TokenProvider;
-import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUser;
+import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class AuthController {
 
   @PostMapping("/login/user")
   public ResponseEntity<?> userLogin(@RequestBody @Valid Login.Request request) {
-    User user = this.authService.login(request);
+    UserDto user = this.authService.login(request);
     return ResponseEntity.ok(
         this.tokenProvider.generateToken(
             user.getEmail(),

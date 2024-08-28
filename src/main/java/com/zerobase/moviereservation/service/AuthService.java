@@ -1,6 +1,5 @@
 package com.zerobase.moviereservation.service;
 
-import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUser;
 import com.zerobase.moviereservation.model.dto.UserDto;
@@ -12,6 +11,6 @@ public interface AuthService {
 
   UserDto register(RegisterUser.Request request);
 
-  User login(Login.Request request);
+  UserDto login(Login.Request request);
 
 }

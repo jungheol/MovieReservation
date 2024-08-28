@@ -48,14 +48,14 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     return UserDto.fromEntity(user);
   }
 
-  public User login(Login.Request request) {
-    User user = checkEmail(request.getEmail());
+  public UserDto login(Login.Request request) {
+    UserDto userDto = UserDto.fromEntity(checkEmail(request.getEmail()));
 
-    if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+    if (!this.passwordEncoder.matches(request.getPassword(), userDto.getPassword())) {
       throw new CustomException(PASSWORD_NOT_MATCHED);
     }
 
-    return user;
+    return userDto;
   }
 
   @Override
