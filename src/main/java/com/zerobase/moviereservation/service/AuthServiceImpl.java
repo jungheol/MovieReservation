@@ -77,6 +77,15 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   @Override
   @Transactional
+  public void deleteUser(String email) {
+    User user = this.userRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    this.userRepository.delete(user);
+  }
+
+  @Override
+  @Transactional
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(email).orElseThrow(() -> new
         UsernameNotFoundException("USER not found with email: " + email));

@@ -16,4 +16,6 @@ public interface AuthService {
 
   UserDto updateUser(Long userId, UpdateUserDto.Request request);
 
+  void deleteUser(String email);
+
 }
