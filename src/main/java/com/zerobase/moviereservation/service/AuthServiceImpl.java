@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     return UserDto.fromEntity(user);
   }
 
-  public UserDto login(Login.Request request) {
+  public UserDto loginUser(Login.Request request) {
     UserDto userDto = UserDto.fromEntity(checkEmail(request.getEmail()));
 
     if (!this.passwordEncoder.matches(request.getPassword(), userDto.getPassword())) {

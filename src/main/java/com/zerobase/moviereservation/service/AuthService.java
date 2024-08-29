@@ -11,6 +11,6 @@ public interface AuthService {
 
   UserDto register(RegisterUser.Request request);
 
-  UserDto login(Login.Request request);
+  UserDto loginUser(Login.Request request);
 
 }

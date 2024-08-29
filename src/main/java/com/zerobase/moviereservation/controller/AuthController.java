@@ -28,7 +28,7 @@ public class AuthController {
 
   @PostMapping("/login/user")
   public ResponseEntity<?> userLogin(@RequestBody @Valid Login.Request request) {
-    UserDto user = this.authService.login(request);
+    UserDto user = this.authService.loginUser(request);
     return ResponseEntity.ok(
         this.tokenProvider.generateToken(
             user.getEmail(),
