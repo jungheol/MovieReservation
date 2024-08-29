@@ -9,6 +9,7 @@ import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUser;
+import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.model.type.Role;
 import com.zerobase.moviereservation.repository.UserRepository;
@@ -56,6 +57,22 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     }
 
     return userDto;
+  }
+
+  @Override
+  @Transactional
+  public UserDto updateUser(Long userId, UpdateUserDto.Request request) {
+    User user = this.userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    request.setPassword(this.passwordEncoder.encode(request.getPassword()));
+
+    user.setPassword(request.getPassword());
+    user.setUsername(request.getUsername());
+    user.setBirthday(request.getBirthday());
+    user.setPhoneNumber(request.getPhoneNumber());
+
+    return UserDto.fromEntity(user);
   }
 
   @Override

@@ -3,12 +3,15 @@ package com.zerobase.moviereservation.controller;
 import com.zerobase.moviereservation.auth.TokenProvider;
 import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUser;
+import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +37,12 @@ public class AuthController {
             user.getEmail(),
             user.getRole())
     );
+  }
+
+  @PutMapping("/update/user/{userId}")
+  public UpdateUserDto.Response updateUser(
+      @PathVariable("userId") Long userId,
+      @RequestBody @Valid UpdateUserDto.Request request) {
+    return UpdateUserDto.Response.from(this.authService.updateUser(userId, request));
   }
 }
