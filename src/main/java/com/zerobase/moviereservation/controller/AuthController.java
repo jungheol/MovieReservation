@@ -2,7 +2,7 @@ package com.zerobase.moviereservation.controller;
 
 import com.zerobase.moviereservation.auth.TokenProvider;
 import com.zerobase.moviereservation.model.dto.Login;
-import com.zerobase.moviereservation.model.dto.RegisterUser;
+import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.service.AuthService;
@@ -27,8 +27,8 @@ public class AuthController {
   private final TokenProvider tokenProvider;
 
   @PostMapping("/register/user")
-  public RegisterUser.Response register(@RequestBody RegisterUser.Request request) {
-    return RegisterUser.Response.from(this.authService.register(request));
+  public RegisterUserDto.Response register(@RequestBody RegisterUserDto.Request request) {
+    return RegisterUserDto.Response.from(this.authService.register(request));
   }
 
   @PostMapping("/login/user")

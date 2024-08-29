@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-public class RegisterUser {
+public class RegisterUserDto {
 
   @Data
   @Builder

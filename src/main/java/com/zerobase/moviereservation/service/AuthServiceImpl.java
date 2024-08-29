@@ -8,7 +8,7 @@ import static com.zerobase.moviereservation.model.type.Role.USER;
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.Login;
-import com.zerobase.moviereservation.model.dto.RegisterUser;
+import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.model.type.Role;
@@ -30,7 +30,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   @Override
   @Transactional
-  public UserDto register(RegisterUser.Request request) {
+  public UserDto register(RegisterUserDto.Request request) {
     if (this.userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ALREADY_EXISTED_EMAIL);
     }
