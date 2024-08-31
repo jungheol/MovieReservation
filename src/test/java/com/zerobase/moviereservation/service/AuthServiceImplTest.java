@@ -35,37 +35,37 @@ class AuthServiceImplTest {
   @InjectMocks
   private AuthServiceImpl authServiceImpl;
 
-  private RegisterUserDto.Request req;
+  private RegisterUserDto.Request registerUserDto;
 
   @BeforeEach
   void setUp() {
-    req = new RegisterUserDto.Request();
-    req.setEmail("test@example.com");
-    req.setPassword("password123");
-    req.setUsername("testuser");
-    req.setBirthday(LocalDate.parse("1990-01-01"));
-    req.setPhoneNumber("123-456-7890");
+    registerUserDto = new RegisterUserDto.Request();
+    registerUserDto.setEmail("test@example.com");
+    registerUserDto.setPassword("password123");
+    registerUserDto.setUsername("testuser");
+    registerUserDto.setBirthday(LocalDate.parse("1990-01-01"));
+    registerUserDto.setPhoneNumber("123-456-7890");
   }
 
   @Test
   @DisplayName("유저 가입 성공")
   void testRegister_Success() {
     // given
-    when(userRepository.existsByEmail(req.getEmail())).thenReturn(false);
-    when(passwordEncoder.encode(req.getPassword())).thenReturn("password123");
+    when(userRepository.existsByEmail(registerUserDto.getEmail())).thenReturn(false);
+    when(passwordEncoder.encode(registerUserDto.getPassword())).thenReturn("password123");
     when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
     // when
-    UserDto result = authServiceImpl.register(req);
+    UserDto result = authServiceImpl.register(registerUserDto);
 
     // then
     assertThat(result).isNotNull();
-    assertThat(result.getEmail()).isEqualTo(req.getEmail());
-    assertThat(result.getUsername()).isEqualTo(req.getUsername());
+    assertThat(result.getEmail()).isEqualTo(registerUserDto.getEmail());
+    assertThat(result.getUsername()).isEqualTo(registerUserDto.getUsername());
 
     // 검증
-    verify(userRepository).existsByEmail(req.getEmail());
-    verify(passwordEncoder).encode(req.getPassword());
+    verify(userRepository).existsByEmail(registerUserDto.getEmail());
+    verify(passwordEncoder).encode(registerUserDto.getPassword());
     verify(userRepository).save(any(User.class));
   }
 
@@ -74,14 +74,14 @@ class AuthServiceImplTest {
   @DisplayName("동일한 이메일 존재")
   void testRegister_Fail() {
     // given
-    when(userRepository.existsByEmail(req.getEmail())).thenReturn(true);
+    when(userRepository.existsByEmail(registerUserDto.getEmail())).thenReturn(true);
 
     // when & then
     CustomException exception = assertThrows(CustomException.class,
-        () -> authServiceImpl.register(req));
+        () -> authServiceImpl.register(registerUserDto));
     assertEquals(ALREADY_EXISTED_EMAIL, exception.getErrorCode());
 
     // 검증
-    verify(userRepository).existsByEmail(req.getEmail());
+    verify(userRepository).existsByEmail(registerUserDto.getEmail());
   }
 }
