@@ -41,9 +41,9 @@ public class AuthController {
     );
   }
 
-  @PutMapping("/update/user/{userId}")
+  @PutMapping("/update/users/{id}")
   public UpdateUserDto.Response updateUser(
-      @PathVariable("userId") Long userId,
+      @PathVariable("id") Long userId,
       @RequestBody @Valid UpdateUserDto.Request request) {
     return UpdateUserDto.Response.from(this.authService.updateUser(userId, request));
   }
