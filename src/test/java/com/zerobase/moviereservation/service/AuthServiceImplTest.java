@@ -10,10 +10,12 @@ import static org.mockito.Mockito.when;
 
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
+import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,10 @@ class AuthServiceImplTest {
 
   private RegisterUserDto.Request registerUserDto;
 
+  private Login.Request loginDto;
+
+  private User user;
+
   @BeforeEach
   void setUp() {
     registerUserDto = new RegisterUserDto.Request();
@@ -45,6 +51,15 @@ class AuthServiceImplTest {
     registerUserDto.setUsername("testuser");
     registerUserDto.setBirthday(LocalDate.parse("1990-01-01"));
     registerUserDto.setPhoneNumber("123-456-7890");
+
+    loginDto = new Login.Request();
+    loginDto.setEmail("test@example.com");
+    loginDto.setPassword("password123");
+
+    user = User.builder()
+        .email(loginDto.getEmail())
+        .password(loginDto.getPassword())
+        .build();
   }
 
   @Test
@@ -83,5 +98,21 @@ class AuthServiceImplTest {
 
     // 검증
     verify(userRepository).existsByEmail(registerUserDto.getEmail());
+  }
+
+  @Test
+  @DisplayName("로그인 성공")
+  void testLogin_Success() {
+    // given
+    when(userRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())).thenReturn(true);
+
+    // when
+    UserDto result = authServiceImpl.loginUser(loginDto);
+
+    // then
+    assertThat(result).isNotNull();
+    assertThat(result.getEmail()).isEqualTo(loginDto.getEmail());
+    assertThat(result.getUsername()).isEqualTo(user.getUsername());
   }
 }
