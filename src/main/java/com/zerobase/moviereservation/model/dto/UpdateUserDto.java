@@ -6,15 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-public class RegisterUser {
+public class UpdateUserDto {
 
   @Data
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Request {
-    private String email;
     private String password;
     private String username;
     private LocalDate birthday;
@@ -26,13 +24,17 @@ public class RegisterUser {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Response {
-    private String email;
+    private String password;
     private String username;
+    private LocalDate birthday;
+    private String phoneNumber;
 
     public static Response from(UserDto userDto) {
       return Response.builder()
-          .email(userDto.getEmail())
+          .password(userDto.getPassword())
           .username(userDto.getUsername())
+          .birthday(userDto.getBirthday())
+          .phoneNumber(userDto.getPhoneNumber())
           .build();
     }
   }

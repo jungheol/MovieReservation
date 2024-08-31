@@ -8,7 +8,8 @@ import static com.zerobase.moviereservation.model.type.Role.USER;
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.Login;
-import com.zerobase.moviereservation.model.dto.RegisterUser;
+import com.zerobase.moviereservation.model.dto.RegisterUserDto;
+import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.model.type.Role;
 import com.zerobase.moviereservation.repository.UserRepository;
@@ -29,7 +30,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   @Override
   @Transactional
-  public UserDto register(RegisterUser.Request request) {
+  public UserDto register(RegisterUserDto.Request request) {
     if (this.userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ALREADY_EXISTED_EMAIL);
     }
@@ -48,7 +49,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     return UserDto.fromEntity(user);
   }
 
-  public UserDto login(Login.Request request) {
+  public UserDto loginUser(Login.Request request) {
     UserDto userDto = UserDto.fromEntity(checkEmail(request.getEmail()));
 
     if (!this.passwordEncoder.matches(request.getPassword(), userDto.getPassword())) {
@@ -56,6 +57,31 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     }
 
     return userDto;
+  }
+
+  @Override
+  @Transactional
+  public UserDto updateUser(Long userId, UpdateUserDto.Request request) {
+    User user = this.userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    request.setPassword(this.passwordEncoder.encode(request.getPassword()));
+
+    user.setPassword(request.getPassword());
+    user.setUsername(request.getUsername());
+    user.setBirthday(request.getBirthday());
+    user.setPhoneNumber(request.getPhoneNumber());
+
+    return UserDto.fromEntity(user);
+  }
+
+  @Override
+  @Transactional
+  public void deleteUser(String email) {
+    User user = this.userRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    this.userRepository.delete(user);
   }
 
   @Override
