@@ -13,7 +13,6 @@ public class UpdateUserDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Request {
-    private String email;
     private String password;
     private String username;
     private LocalDate birthday;
