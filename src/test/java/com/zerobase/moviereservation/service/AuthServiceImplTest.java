@@ -1,11 +1,15 @@
 package com.zerobase.moviereservation.service;
 
+import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.zerobase.moviereservation.entity.User;
+import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.repository.UserRepository;
@@ -63,5 +67,21 @@ class AuthServiceImplTest {
     verify(userRepository).existsByEmail(req.getEmail());
     verify(passwordEncoder).encode(req.getPassword());
     verify(userRepository).save(any(User.class));
+  }
+
+
+  @Test
+  @DisplayName("동일한 이메일 존재")
+  void testRegister_Fail() {
+    // given
+    when(userRepository.existsByEmail(req.getEmail())).thenReturn(true);
+
+    // when & then
+    CustomException exception = assertThrows(CustomException.class,
+        () -> authServiceImpl.register(req));
+    assertEquals(ALREADY_EXISTED_EMAIL, exception.getErrorCode());
+
+    // 검증
+    verify(userRepository).existsByEmail(req.getEmail());
   }
 }
