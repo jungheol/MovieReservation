@@ -115,4 +115,20 @@ class AuthServiceImplTest {
     assertThat(result.getEmail()).isEqualTo(loginDto.getEmail());
     assertThat(result.getUsername()).isEqualTo(user.getUsername());
   }
+
+  @Test
+  @DisplayName("로그인 실패 - 비밀번호 불일치")
+  void testLogin_Fail() {
+    // given
+    when(userRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())).thenReturn(false);
+
+    // when & then
+    assertThrows(CustomException.class, () -> {
+      authServiceImpl.loginUser(loginDto);
+    });
+
+    // verify
+    verify(passwordEncoder).matches(loginDto.getPassword(), user.getPassword());
+  }
 }
