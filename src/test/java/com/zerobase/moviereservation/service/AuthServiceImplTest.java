@@ -147,9 +147,10 @@ class AuthServiceImplTest {
 
   @Test
   @DisplayName("유저 정보 업데이트 성공")
-  void tsetUpdate_Success() {
-    Long userId = 1L;
+  void testUpdate_Success() {
+
     // given
+    Long userId = 1L;
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(passwordEncoder.encode(any())).thenReturn("newPassword123");
 
