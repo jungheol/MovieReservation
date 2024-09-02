@@ -12,6 +12,8 @@ import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUserDto;
+import com.zerobase.moviereservation.model.dto.UpdateUserDto;
+import com.zerobase.moviereservation.model.dto.UpdateUserDto.Request;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDate;
@@ -41,6 +43,8 @@ class AuthServiceImplTest {
 
   private Login.Request loginDto;
 
+  private UpdateUserDto.Request updateDto;
+
   private User user;
 
   @BeforeEach
@@ -56,9 +60,18 @@ class AuthServiceImplTest {
     loginDto.setEmail("test@example.com");
     loginDto.setPassword("password123");
 
+    updateDto = new UpdateUserDto.Request();
+    updateDto.setUsername("newTestUser");
+    updateDto.setPassword("newPassword123");
+    updateDto.setBirthday(LocalDate.parse("1990-12-31"));
+    updateDto.setPhoneNumber("010-0000-1234");
+
     user = User.builder()
-        .email(loginDto.getEmail())
-        .password(loginDto.getPassword())
+        .email(registerUserDto.getEmail())
+        .password(registerUserDto.getPassword())
+        .username(registerUserDto.getUsername())
+        .birthday(registerUserDto.getBirthday())
+        .phoneNumber(registerUserDto.getPhoneNumber())
         .build();
   }
 
@@ -130,5 +143,27 @@ class AuthServiceImplTest {
 
     // verify
     verify(passwordEncoder).matches(loginDto.getPassword(), user.getPassword());
+  }
+
+  @Test
+  @DisplayName("유저 정보 업데이트 성공")
+  void tsetUpdate_Success() {
+    Long userId = 1L;
+    // given
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(passwordEncoder.encode(any())).thenReturn("newPassword123");
+
+    // when
+    UserDto userDto = authServiceImpl.updateUser(userId, updateDto);
+
+    // then
+    assertEquals("newTestUser", userDto.getUsername());
+    assertEquals("newPassword123", userDto.getPassword());
+    assertEquals(LocalDate.parse("1990-12-31"), userDto.getBirthday());
+    assertEquals("010-0000-1234", userDto.getPhoneNumber());
+
+    // verify
+    verify(userRepository).findById(userId);
+    verify(passwordEncoder).encode(updateDto.getPassword());
   }
 }
