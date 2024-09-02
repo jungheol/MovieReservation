@@ -1,10 +1,13 @@
 package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_EMAIL;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.PASSWORD_NOT_MATCHED;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -133,13 +136,13 @@ class AuthServiceImplTest {
   @DisplayName("로그인 실패 - 비밀번호 불일치")
   void testLogin_Fail() {
     // given
-    when(userRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));
+    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())).thenReturn(false);
 
     // when & then
-    assertThrows(CustomException.class, () -> {
-      authServiceImpl.loginUser(loginDto);
-    });
+    CustomException exception = assertThrows(CustomException.class,
+        () -> authServiceImpl.loginUser(loginDto));
+    assertEquals(PASSWORD_NOT_MATCHED, exception.getErrorCode());
 
     // verify
     verify(passwordEncoder).matches(loginDto.getPassword(), user.getPassword());
@@ -173,10 +176,12 @@ class AuthServiceImplTest {
   void testUpdate_Fail() {
     // given
     Long userId = 1L;
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     // when & then
-    assertThrows(CustomException.class, () -> authServiceImpl.updateUser(userId, updateDto));
+    CustomException exception = assertThrows(CustomException.class,
+        () -> authServiceImpl.updateUser(userId, updateDto));
+    assertEquals(USER_NOT_FOUND, exception.getErrorCode());
 
     // verify
     verify(userRepository).findById(userId);
@@ -205,7 +210,9 @@ class AuthServiceImplTest {
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
     // when & then
-    assertThrows(CustomException.class, () -> authServiceImpl.deleteUser(email));
+    CustomException exception = assertThrows(CustomException.class,
+        () -> authServiceImpl.deleteUser(email));
+    assertEquals(USER_NOT_FOUND, exception.getErrorCode());
 
     // verify
     verify(userRepository).findByEmail(email);
