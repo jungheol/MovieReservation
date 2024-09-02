@@ -13,7 +13,6 @@ import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UpdateUserDto;
-import com.zerobase.moviereservation.model.dto.UpdateUserDto.Request;
 import com.zerobase.moviereservation.model.dto.UserDto;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDate;
@@ -166,5 +165,19 @@ class AuthServiceImplTest {
     // verify
     verify(userRepository).findById(userId);
     verify(passwordEncoder).encode(updateDto.getPassword());
+  }
+
+  @Test
+  @DisplayName("유저 정보 업데이트 실패")
+  void testUpdate_Fail() {
+    // given
+    Long userId = 1L;
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // when & then
+    assertThrows(CustomException.class, () -> authServiceImpl.updateUser(userId, updateDto));
+
+    // verify
+    verify(userRepository).findById(userId);
   }
 }
