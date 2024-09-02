@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -179,5 +180,34 @@ class AuthServiceImplTest {
 
     // verify
     verify(userRepository).findById(userId);
+  }
+
+  @Test
+  @DisplayName("유저 정보 삭제 성공")
+  void testDelete_Success() {
+    // given
+    String email = "test@example.com";
+    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+    // when & then
+    authServiceImpl.deleteUser(email);
+
+    // verify
+    verify(userRepository).findByEmail(email);
+    verify(userRepository).delete(user);
+  }
+
+  @Test
+  @DisplayName("유저 정보 삭제 실패")
+  void testDelete_Fail() {
+    // given
+    String email = "failTest@example.com";
+    when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+    // when & then
+    assertThrows(CustomException.class, () -> authServiceImpl.deleteUser(email));
+
+    // verify
+    verify(userRepository).findByEmail(email);
   }
 }
