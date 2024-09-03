@@ -27,7 +27,8 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authorizeHttpRequests(
-            authorizeRequests -> authorizeRequests.requestMatchers("/**").permitAll()
+            authorizeRequests -> authorizeRequests.requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/theater/**").hasRole("OWNER")
         )
         .addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
