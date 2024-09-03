@@ -3,7 +3,6 @@ package com.zerobase.moviereservation.service;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_EMAIL;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.PASSWORD_NOT_MATCHED;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.USER_NOT_FOUND;
-import static com.zerobase.moviereservation.model.type.Role.USER;
 
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
@@ -30,7 +29,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   @Override
   @Transactional
-  public UserDto register(RegisterUserDto.Request request) {
+  public UserDto registerUser(RegisterUserDto.Request request, Role role) {
     if (this.userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ALREADY_EXISTED_EMAIL);
     }
@@ -43,7 +42,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         .username(request.getUsername())
         .birthday(request.getBirthday())
         .phoneNumber(request.getPhoneNumber())
-        .role(USER)
+        .role(role)
         .build());
 
     return UserDto.fromEntity(user);
@@ -90,7 +89,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     User user = userRepository.findByEmail(email).orElseThrow(() -> new
         UsernameNotFoundException("USER not found with email: " + email));
 
-    return createUserDetail(user.getEmail(), user.getPassword(), USER);
+    return createUserDetail(user.getEmail(), user.getPassword(), user.getRole());
   }
 
   private User checkEmail(String email) {
