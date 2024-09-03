@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "theater")
-public class Theater extends BaseTimeEntity{
+public class Theater extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +27,5 @@ public class Theater extends BaseTimeEntity{
   private String address;
 
   private int seatCount;
-  
+
 }
