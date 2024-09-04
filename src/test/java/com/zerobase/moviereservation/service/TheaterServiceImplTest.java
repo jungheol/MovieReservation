@@ -125,4 +125,35 @@ class TheaterServiceImplTest {
     // verify
     verify(theaterRepository).findById(theaterId);
   }
+
+  @Test
+  @DisplayName("영화관 정보 삭제 성공")
+  void testDelete_Success() {
+    // given
+    Long theaterId = 1L;
+    when(theaterRepository.findById(theaterId)).thenReturn(Optional.of(theater));
+
+    // when & then
+    theaterServiceImpl.deleteTheater(theaterId);
+
+    // verify
+    verify(theaterRepository).findById(theaterId);
+    verify(theaterRepository).delete(theater);
+  }
+
+  @Test
+  @DisplayName("영화관 정보 삭제 실패")
+  void testDelete_Fail() {
+    // given
+    Long theaterId = 1L;
+    when(theaterRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+    // when & then
+    CustomException exception = assertThrows(CustomException.class,
+        () -> theaterServiceImpl.deleteTheater(theaterId));
+    assertEquals(THEATER_NOT_FOUND, exception.getErrorCode());
+
+    // verify
+    verify(theaterRepository).findById(theaterId);
+  }
 }
