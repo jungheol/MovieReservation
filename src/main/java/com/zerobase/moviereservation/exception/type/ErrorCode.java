@@ -16,7 +16,8 @@ public enum ErrorCode {
   PASSWORD_NOT_MATCHED("U_03", "비밀번호가 틀렸습니다."),
 
   // theater error
-  ALREADY_EXISTED_THEATERNAME("T_01", "이미 존재하는 영화관 이름입니다.");
+  ALREADY_EXISTED_THEATERNAME("T_01", "이미 존재하는 영화관 이름입니다."),
+  THEATER_NOT_FOUND("T_02", "해당 영화관을 찾을 수 없습니다.");
 
   private final String code;
   private final String description;

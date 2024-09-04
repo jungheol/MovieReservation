@@ -1,11 +1,13 @@
 package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_THEATERNAME;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.THEATER_NOT_FOUND;
 
 import com.zerobase.moviereservation.entity.Theater;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterTheaterDto.Request;
 import com.zerobase.moviereservation.model.dto.TheaterDto;
+import com.zerobase.moviereservation.model.dto.UpdateTheaterDto;
 import com.zerobase.moviereservation.repository.TheaterRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,5 +33,26 @@ public class TheaterServiceImpl implements TheaterService {
         .build());
 
     return TheaterDto.fromEntity(theater);
+  }
+
+  @Override
+  @Transactional
+  public TheaterDto updateTheater(Long theaterId, UpdateTheaterDto.Request request) {
+    Theater theater = this.theaterRepository.findById(theaterId)
+        .orElseThrow(() -> new CustomException(THEATER_NOT_FOUND));
+
+    theater.setTheaterName(request.getTheaterName());
+    theater.setAddress(request.getAddress());
+
+    return TheaterDto.fromEntity(theater);
+  }
+
+  @Override
+  @Transactional
+  public void deleteTheater(Long theaterId) {
+    Theater theater = this.theaterRepository.findById(theaterId)
+        .orElseThrow(() -> new CustomException(THEATER_NOT_FOUND));
+
+    this.theaterRepository.delete(theater);
   }
 }
