@@ -1,9 +1,11 @@
 package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_THEATERNAME;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.THEATER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,7 +13,9 @@ import com.zerobase.moviereservation.entity.Theater;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterTheaterDto;
 import com.zerobase.moviereservation.model.dto.TheaterDto;
+import com.zerobase.moviereservation.model.dto.UpdateTheaterDto;
 import com.zerobase.moviereservation.repository.TheaterRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +35,8 @@ class TheaterServiceImplTest {
 
   private RegisterTheaterDto.Request registerTheaterDto;
 
+  private UpdateTheaterDto.Request updateTheaterDto;
+
   private Theater theater;
 
   @BeforeEach
@@ -39,6 +45,10 @@ class TheaterServiceImplTest {
     registerTheaterDto.setTheaterName("theater1");
     registerTheaterDto.setAddress("address1");
     registerTheaterDto.setSeatCount(100);
+
+    updateTheaterDto = new UpdateTheaterDto.Request();
+    updateTheaterDto.setTheaterName("newTheater1");
+    updateTheaterDto.setAddress("newAddress");
 
     theater = Theater.builder()
         .theaterName(registerTheaterDto.getTheaterName())
@@ -80,5 +90,39 @@ class TheaterServiceImplTest {
 
     // verify
     verify(theaterRepository).existsByTheaterName(registerTheaterDto.getTheaterName());
+  }
+
+  @Test
+  @DisplayName("영화관 정보 업데이트 성공")
+  void testUpdate_Success() {
+    // given
+    Long theaterId = 1L;
+    when(theaterRepository.findById(theaterId)).thenReturn(Optional.of(theater));
+
+    // when
+    TheaterDto theaterDto = theaterServiceImpl.updateTheater(theaterId, updateTheaterDto);
+
+    // then
+    assertEquals("newTheater1", theaterDto.getTheaterName());
+    assertEquals("newAddress", theaterDto.getAddress());
+
+    // verify
+    verify(theaterRepository).findById(theaterId);
+  }
+
+  @Test
+  @DisplayName("영화관 정보 업데이트 실패")
+  void testUpdate_Fail() {
+    // given
+    Long theaterId = 1L;
+    when(theaterRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+    // when & then
+    CustomException exception = assertThrows(CustomException.class,
+        () -> theaterServiceImpl.updateTheater(theaterId, updateTheaterDto));
+    assertEquals(THEATER_NOT_FOUND, exception.getErrorCode());
+
+    // verify
+    verify(theaterRepository).findById(theaterId);
   }
 }
