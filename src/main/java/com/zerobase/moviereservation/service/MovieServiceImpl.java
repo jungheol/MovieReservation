@@ -7,7 +7,6 @@ import com.zerobase.moviereservation.entity.Movie;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto.Request;
-import com.zerobase.moviereservation.model.dto.UpdateMovieDto;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,18 +33,6 @@ public class MovieServiceImpl implements MovieService {
         .releaseDate(request.getReleaseDate())
         .rating(request.getRating())
         .build());
-
-    return MovieDto.fromEntity(movie);
-  }
-
-  // 추후 평점 등록용 update 함수
-  @Override
-  @Transactional
-  public MovieDto updateMovie(Long movieId, UpdateMovieDto.Request request) {
-    Movie movie = this.movieRepository.findById(movieId)
-        .orElseThrow(() -> new CustomException(MOVIE_NOT_FOUND));
-
-    movie.setRating(request.getRating());
 
     return MovieDto.fromEntity(movie);
   }

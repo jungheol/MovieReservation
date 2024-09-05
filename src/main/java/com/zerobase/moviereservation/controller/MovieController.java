@@ -1,15 +1,12 @@
 package com.zerobase.moviereservation.controller;
 
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto;
-import com.zerobase.moviereservation.model.dto.UpdateMovieDto;
 import com.zerobase.moviereservation.service.MovieService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,13 +21,6 @@ public class MovieController {
   @PostMapping
   public RegisterMovieDto.Response register(@RequestBody RegisterMovieDto.Request request) {
     return RegisterMovieDto.Response.from(this.movieService.registerMovie(request));
-  }
-
-  @PutMapping("/{movieId}")
-  public UpdateMovieDto.Response updateMovieRating(
-      @PathVariable("movieId") Long movieId,
-      @RequestBody @Valid UpdateMovieDto.Request request) {
-    return UpdateMovieDto.Response.from(this.movieService.updateMovie(movieId, request));
   }
 
   @DeleteMapping("/{movieId}")

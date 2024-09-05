@@ -13,7 +13,6 @@ import com.zerobase.moviereservation.entity.Movie;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto;
-import com.zerobase.moviereservation.model.dto.UpdateMovieDto;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -36,8 +35,6 @@ class MovieServiceImplTest {
 
   private RegisterMovieDto.Request registerMovieDto;
 
-  private UpdateMovieDto.Request updateMovieDto;
-
   private Movie movie;
 
   @BeforeEach
@@ -49,9 +46,6 @@ class MovieServiceImplTest {
     registerMovieDto.setRunningTime("runningTime1");
     registerMovieDto.setReleaseDate(LocalDate.parse("2024-09-01"));
     registerMovieDto.setRating(0);
-
-    updateMovieDto = new UpdateMovieDto.Request();
-    updateMovieDto.setRating(3);
 
     movie = Movie.builder()
         .title(registerMovieDto.getTitle())
@@ -100,39 +94,6 @@ class MovieServiceImplTest {
 
     // verify
     verify(movieRepository).existsByMovieTitle(registerMovieDto.getTitle());
-  }
-
-  @Test
-  @DisplayName("영화 평점 수정 성공")
-  void testUpdate_Success() {
-    // given
-    Long movieId = 1L;
-    when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
-
-    // when
-    MovieDto movieDto = movieServiceImpl.updateMovie(movieId, updateMovieDto);
-
-    // then
-    assertEquals(3, movieDto.getRating());
-
-    // verify
-    verify(movieRepository).findById(movieId);
-  }
-
-  @Test
-  @DisplayName("영화 평점 수정 실패")
-  void testUpdate_Fail() {
-    // given
-    Long movieId = 1L;
-    when(movieRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-    // when & then
-    CustomException exception = assertThrows(CustomException.class,
-        () -> movieServiceImpl.updateMovie(movieId, updateMovieDto));
-    assertEquals(MOVIE_NOT_FOUND, exception.getErrorCode());
-
-    // verify
-    verify(movieRepository).findById(movieId);
   }
 
   @Test
