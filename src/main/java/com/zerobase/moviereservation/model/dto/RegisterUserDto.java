@@ -14,6 +14,7 @@ public class RegisterUserDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Request {
+
     private String email;
     private String password;
     private String username;
@@ -26,6 +27,7 @@ public class RegisterUserDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Response {
+
     private String email;
     private String username;
 

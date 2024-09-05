@@ -12,6 +12,7 @@ public class UpdateTheaterDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Request {
+
     private String theaterName;
     private String address;
   }
@@ -21,6 +22,7 @@ public class UpdateTheaterDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Response {
+
     private String theaterName;
     private String address;
 
