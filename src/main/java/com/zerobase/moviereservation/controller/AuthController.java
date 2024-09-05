@@ -5,6 +5,7 @@ import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
+import com.zerobase.moviereservation.model.type.Role;
 import com.zerobase.moviereservation.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,17 @@ public class AuthController {
   private final TokenProvider tokenProvider;
 
   @PostMapping("/register/user")
-  public RegisterUserDto.Response register(@RequestBody RegisterUserDto.Request request) {
-    return RegisterUserDto.Response.from(this.authService.register(request));
+  public RegisterUserDto.Response registerUser(@RequestBody RegisterUserDto.Request request) {
+    return RegisterUserDto.Response.from(this.authService.registerUser(request, Role.USER));
   }
 
-  @PostMapping("/login/user")
-  public ResponseEntity<?> userLogin(@RequestBody @Valid Login.Request request) {
+  @PostMapping("/register/owner")
+  public RegisterUserDto.Response registerOwner(@RequestBody RegisterUserDto.Request request) {
+    return RegisterUserDto.Response.from(this.authService.registerUser(request, Role.OWNER));
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<?> loginUser(@RequestBody @Valid Login.Request request) {
     UserDto user = this.authService.loginUser(request);
     return ResponseEntity.ok(
         this.tokenProvider.generateToken(

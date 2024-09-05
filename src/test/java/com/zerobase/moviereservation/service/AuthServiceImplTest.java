@@ -18,6 +18,7 @@ import com.zerobase.moviereservation.model.dto.Login;
 import com.zerobase.moviereservation.model.dto.RegisterUserDto;
 import com.zerobase.moviereservation.model.dto.UpdateUserDto;
 import com.zerobase.moviereservation.model.dto.UserDto;
+import com.zerobase.moviereservation.model.type.Role;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -87,7 +88,7 @@ class AuthServiceImplTest {
     when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
     // when
-    UserDto result = authServiceImpl.register(registerUserDto);
+    UserDto result = authServiceImpl.registerUser(registerUserDto, Role.USER);
 
     // then
     assertThat(result).isNotNull();
@@ -109,7 +110,7 @@ class AuthServiceImplTest {
 
     // when & then
     CustomException exception = assertThrows(CustomException.class,
-        () -> authServiceImpl.register(registerUserDto));
+        () -> authServiceImpl.registerUser(registerUserDto, Role.USER));
     assertEquals(ALREADY_EXISTED_EMAIL, exception.getErrorCode());
 
     // 검증
