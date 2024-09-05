@@ -27,12 +27,12 @@ public class AuthController {
   private final AuthService authService;
   private final TokenProvider tokenProvider;
 
-  @PostMapping("/register/user")
+  @PostMapping("/users")
   public RegisterUserDto.Response registerUser(@RequestBody RegisterUserDto.Request request) {
     return RegisterUserDto.Response.from(this.authService.registerUser(request, Role.USER));
   }
 
-  @PostMapping("/register/owner")
+  @PostMapping("/owners")
   public RegisterUserDto.Response registerOwner(@RequestBody RegisterUserDto.Request request) {
     return RegisterUserDto.Response.from(this.authService.registerUser(request, Role.OWNER));
   }
@@ -47,16 +47,16 @@ public class AuthController {
     );
   }
 
-  @PutMapping("/update/users/{id}")
+  @PutMapping("/users/{id}")
   public UpdateUserDto.Response updateUser(
       @PathVariable("id") Long userId,
       @RequestBody @Valid UpdateUserDto.Request request) {
     return UpdateUserDto.Response.from(this.authService.updateUser(userId, request));
   }
 
-  @DeleteMapping("/delete/user")
+  @DeleteMapping("/{email}")
   public ResponseEntity<?> deleteUser(
-      @RequestParam("email") String email
+      @PathVariable("email") String email
   ) {
     this.authService.deleteUser(email);
     return ResponseEntity.ok("유저 정보가 삭제되었습니다.");

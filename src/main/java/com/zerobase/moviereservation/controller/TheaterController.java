@@ -16,27 +16,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/theater")
+@RequestMapping("/theaters")
 @RequiredArgsConstructor
 public class TheaterController {
 
   private final TheaterService theaterService;
 
-  @PostMapping("/register")
+  @PostMapping
   public RegisterTheaterDto.Response register(@RequestBody RegisterTheaterDto.Request request) {
     return RegisterTheaterDto.Response.from(this.theaterService.registerTheater(request));
   }
 
-  @PutMapping("/update/{theaterId}")
+  @PutMapping("/{theaterId}")
   public UpdateTheaterDto.Response updateTheater(
       @PathVariable("theaterId") Long theaterId,
       @RequestBody @Valid UpdateTheaterDto.Request request) {
     return UpdateTheaterDto.Response.from(this.theaterService.updateTheater(theaterId, request));
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/{theaterId}")
   public ResponseEntity<?> deleteTheater(
-      @RequestParam("theaterId") Long theaterId
+      @PathVariable("theaterId") Long theaterId
   ) {
     this.theaterService.deleteTheater(theaterId);
     return ResponseEntity.ok("영화관 정보가 삭제되었습니다.");
