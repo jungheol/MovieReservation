@@ -61,7 +61,7 @@ class MovieServiceImplTest {
   @DisplayName("영화 등록 성공")
   void testRegister_Success() {
     // given
-    when(movieRepository.existsByMovieTitle(registerMovieDto.getTitle())).thenReturn(false);
+    when(movieRepository.existsByTitle(registerMovieDto.getTitle())).thenReturn(false);
     when(movieRepository.save(any(Movie.class))).thenReturn(movie);
 
     // when
@@ -77,7 +77,7 @@ class MovieServiceImplTest {
     assertThat(result.getRating()).isEqualTo(registerMovieDto.getRating());
 
     // verify
-    verify(movieRepository).existsByMovieTitle(registerMovieDto.getTitle());
+    verify(movieRepository).existsByTitle(registerMovieDto.getTitle());
     verify(movieRepository).save(any(Movie.class));
   }
 
@@ -85,7 +85,7 @@ class MovieServiceImplTest {
   @DisplayName("영화 등록 실패")
   void testRegister_Fail() {
     // given
-    when(movieRepository.existsByMovieTitle(registerMovieDto.getTitle())).thenReturn(true);
+    when(movieRepository.existsByTitle(registerMovieDto.getTitle())).thenReturn(true);
 
     // when & then
     CustomException exception = assertThrows(CustomException.class,
@@ -93,7 +93,7 @@ class MovieServiceImplTest {
     assertEquals(ALREADY_EXISTED_TITLE, exception.getErrorCode());
 
     // verify
-    verify(movieRepository).existsByMovieTitle(registerMovieDto.getTitle());
+    verify(movieRepository).existsByTitle(registerMovieDto.getTitle());
   }
 
   @Test

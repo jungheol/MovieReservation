@@ -21,7 +21,7 @@ public class MovieServiceImpl implements MovieService {
   @Override
   @Transactional
   public MovieDto registerMovie(Request request) {
-    if (this.movieRepository.existsByMovieTitle(request.getTitle())) {
+    if (this.movieRepository.existsByTitle(request.getTitle())) {
       throw new CustomException(ALREADY_EXISTED_TITLE);
     }
 
