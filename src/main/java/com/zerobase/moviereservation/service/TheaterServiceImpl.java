@@ -41,6 +41,11 @@ public class TheaterServiceImpl implements TheaterService {
     Theater theater = this.theaterRepository.findById(theaterId)
         .orElseThrow(() -> new CustomException(THEATER_NOT_FOUND));
 
+    if (this.theaterRepository.existsByTheaterName(request.getTheaterName()) &&
+        !theater.getTheaterName().equals(request.getTheaterName())) {
+      throw new CustomException(ALREADY_EXISTED_THEATERNAME);
+    }
+
     theater.setTheaterName(request.getTheaterName());
     theater.setAddress(request.getAddress());
 
