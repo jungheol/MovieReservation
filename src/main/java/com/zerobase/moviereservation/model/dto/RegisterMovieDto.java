@@ -1,6 +1,5 @@
 package com.zerobase.moviereservation.model.dto;
 
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +19,6 @@ public class RegisterMovieDto {
     private String genre;
     private String runningTime;
     private LocalDate releaseDate;
-    private Integer rating = 0;
   }
 
   @Data

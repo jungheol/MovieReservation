@@ -31,7 +31,6 @@ public class MovieServiceImpl implements MovieService {
         .genre(request.getGenre())
         .runningTime(request.getRunningTime())
         .releaseDate(request.getReleaseDate())
-        .rating(request.getRating())
         .build());
 
     return MovieDto.fromEntity(movie);
