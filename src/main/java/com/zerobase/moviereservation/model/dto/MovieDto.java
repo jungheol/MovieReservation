@@ -21,7 +21,7 @@ public class MovieDto {
   private String genre;
   private String runningTime;
   private LocalDate releaseDate;
-  private Integer rating;
+  private Double rating;
 
   public static MovieDto fromEntity(Movie movie) {
     return MovieDto.builder()

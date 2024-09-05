@@ -32,7 +32,7 @@ public class RegisterMovieDto {
     private String genre;
     private String runningTime;
     private LocalDate releaseDate;
-    private Integer rating;
+    private Double rating;
 
     public static Response from(MovieDto movieDto) {
       return Response.builder()
