@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -38,5 +39,12 @@ public class Movie extends BaseTimeEntity {
 
   @Column(columnDefinition = "DOUBLE default 0.0")
   private Double rating;
+
+  @PrePersist
+  public void prePersist() {
+    if (this.rating == null) {
+      this.rating = 0.0;
+    }
+  }
 
 }
