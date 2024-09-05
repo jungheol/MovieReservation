@@ -21,7 +21,11 @@ public enum ErrorCode {
 
   // movie error
   ALREADY_EXISTED_TITLE("M_01", "이미 존재하는 영화 제목입니다."),
-  MOVIE_NOT_FOUND("M_02", "해당 영화를 찾을 수 없습니다.");
+  MOVIE_NOT_FOUND("M_02", "해당 영화를 찾을 수 없습니다."),
+
+  // schedule error
+  ALREADY_EXISTED_SCHEDULE("S_01", "이미 존재하는 스케쥴입니다."),
+  SCHEDULE_NOT_FOUND("S_02", "해당 스케쥴을 찾을 수 없습니다.");
 
   private final String code;
   private final String description;
