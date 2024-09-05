@@ -17,7 +17,11 @@ public enum ErrorCode {
 
   // theater error
   ALREADY_EXISTED_THEATERNAME("T_01", "이미 존재하는 영화관 이름입니다."),
-  THEATER_NOT_FOUND("T_02", "해당 영화관을 찾을 수 없습니다.");
+  THEATER_NOT_FOUND("T_02", "해당 영화관을 찾을 수 없습니다."),
+
+  // movie error
+  ALREADY_EXISTED_TITLE("M_01", "이미 존재하는 영화 제목입니다."),
+  MOVIE_NOT_FOUND("M_02", "해당 영화를 찾을 수 없습니다.");
 
   private final String code;
   private final String description;
