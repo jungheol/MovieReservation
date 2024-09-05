@@ -13,6 +13,7 @@ public class Login {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Request {
+
     @Email
     private String email;
     private String password;

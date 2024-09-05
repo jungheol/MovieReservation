@@ -61,7 +61,8 @@ class TheaterServiceImplTest {
   @DisplayName("영화관 등록 성공")
   void testRegister_Success() {
     // given
-    when(theaterRepository.existsByTheaterName(registerTheaterDto.getTheaterName())).thenReturn(false);
+    when(theaterRepository.existsByTheaterName(registerTheaterDto.getTheaterName())).thenReturn(
+        false);
     when(theaterRepository.save(any(Theater.class))).thenReturn(theater);
 
     // when
@@ -81,7 +82,8 @@ class TheaterServiceImplTest {
   @DisplayName("영화관 등록 실패")
   void testRegister_Fail() {
     // given
-    when(theaterRepository.existsByTheaterName(registerTheaterDto.getTheaterName())).thenReturn(true);
+    when(theaterRepository.existsByTheaterName(registerTheaterDto.getTheaterName())).thenReturn(
+        true);
 
     // when & then
     CustomException exception = assertThrows(CustomException.class,
