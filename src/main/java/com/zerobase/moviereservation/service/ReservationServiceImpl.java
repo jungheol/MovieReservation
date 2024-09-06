@@ -69,4 +69,25 @@ public class ReservationServiceImpl implements ReservationService {
         .map(ReservationDto::fromEntity)
         .collect(Collectors.toList());
   }
+
+  @Override
+  @Transactional
+  public List<ReservationDto> canceledReservation(Long userId, Long scheduleId) {
+    List<Reservation> reservations = reservationRepository.findByUserIdAndScheduleId(userId, scheduleId);
+
+    if (reservations.isEmpty()) {
+      throw new CustomException(RESERVATION_NOT_FOUND);
+    }
+    reservations.forEach(reservation -> {
+      reservation.setCancel("Y");
+      reservation.setReserved("N");
+      reservation.setCanceledAt(LocalDateTime.now());
+    });
+
+    List<Reservation> canceledReservations = reservationRepository.saveAll(reservations);
+
+    return canceledReservations.stream()
+        .map(ReservationDto::fromEntity)
+        .collect(Collectors.toList());
+  }
 }

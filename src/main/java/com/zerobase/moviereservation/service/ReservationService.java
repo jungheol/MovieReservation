@@ -7,4 +7,6 @@ import java.util.List;
 public interface ReservationService {
 
   List<ReservationDto> registerReservation(RegisterReservationDto.Request request);
+
+  List<ReservationDto> canceledReservation(Long userId, Long scheduleId);
 }
