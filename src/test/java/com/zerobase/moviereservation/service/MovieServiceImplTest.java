@@ -45,7 +45,6 @@ class MovieServiceImplTest {
     registerMovieDto.setGenre("genre1");
     registerMovieDto.setRunningTime("runningTime1");
     registerMovieDto.setReleaseDate(LocalDate.parse("2024-09-01"));
-    registerMovieDto.setRating(0);
 
     movie = Movie.builder()
         .title(registerMovieDto.getTitle())
@@ -53,7 +52,6 @@ class MovieServiceImplTest {
         .genre(registerMovieDto.getGenre())
         .runningTime(registerMovieDto.getRunningTime())
         .releaseDate(registerMovieDto.getReleaseDate())
-        .rating(registerMovieDto.getRating())
         .build();
   }
 
@@ -74,7 +72,6 @@ class MovieServiceImplTest {
     assertThat(result.getGenre()).isEqualTo(registerMovieDto.getGenre());
     assertThat(result.getRunningTime()).isEqualTo(registerMovieDto.getRunningTime());
     assertThat(result.getReleaseDate()).isEqualTo(registerMovieDto.getReleaseDate());
-    assertThat(result.getRating()).isEqualTo(registerMovieDto.getRating());
 
     // verify
     verify(movieRepository).existsByTitle(registerMovieDto.getTitle());
