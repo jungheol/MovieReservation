@@ -35,7 +35,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     Theater theater = this.theaterRepository.findById(request.getTheaterId())
         .orElseThrow(() -> new CustomException(ErrorCode.THEATER_NOT_FOUND));
 
-    if (this.scheduleRepository.existsByTheaterIdAndStartTime(theater.getId(), request.getStartTime())) {
+    // 추후에 lock 으로 동시에 스케쥴이 잡히지 않도록 구현 추가
+    if (this.scheduleRepository.existsByTheaterIdAndStartTime(
+        theater.getId(), request.getStartTime())) {
       throw new CustomException(ALREADY_EXISTED_SCHEDULE);
     }
 
@@ -60,13 +62,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     Theater theater = this.theaterRepository.findById(request.getTheaterId())
         .orElseThrow(() -> new CustomException(ErrorCode.THEATER_NOT_FOUND));
 
-    boolean scheduleExists = this.scheduleRepository.existsByTheaterAndStartTimeAndIdNot(
-        theater,
-        request.getStartTime(),
-        scheduleId
-    );
-
-    if (scheduleExists) {
+    if (this.scheduleRepository.existsByTheaterAndStartTimeAndIdNot(
+        theater, request.getStartTime(), scheduleId)) {
       throw new CustomException(ALREADY_EXISTED_SCHEDULE);
     }
 
