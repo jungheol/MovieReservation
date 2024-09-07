@@ -12,7 +12,6 @@ import com.zerobase.moviereservation.entity.Seat;
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterReservationDto.Request;
-import com.zerobase.moviereservation.model.dto.RegisterReservationDto.Response;
 import com.zerobase.moviereservation.model.dto.ReservationDto;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
@@ -44,7 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
     // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
-    if (this.reservationRepository.findByScheduleIdAndSeatIdIn(schedule.getId(),
+    if (this.reservationRepository.findByScheduleIdAndSeatsIdIn(schedule.getId(),
         request.getSeatIds()).stream().anyMatch(r -> "N".equals(r.getCancel()))) {
       throw new CustomException(ALREADY_EXISTED_RESERVATION);
     }
@@ -54,14 +53,15 @@ public class ReservationServiceImpl implements ReservationService {
       throw new CustomException(SEAT_NOT_VALID);
     }
 
-    List<Reservation> reservations = seats.stream().map(
-            seat -> Reservation.builder().user(user).schedule(schedule).seat(seat)
-                .cancel(request.getCancel()).reserved(request.getReserved()).build())
-        .collect(Collectors.toList());
+    Reservation reservation = Reservation.builder()
+        .user(user)
+        .schedule(schedule)
+        .seats(seats)
+        .cancel(request.getCancel())
+        .reserved(request.getReserved())
+        .build();
 
-    List<Reservation> savedReservations = reservationRepository.saveAll(reservations);
-
-    return savedReservations.stream().map(ReservationDto::fromEntity).collect(Collectors.toList());
+    return List.of(ReservationDto.fromEntity(reservationRepository.save(reservation)));
   }
 
   @Override
