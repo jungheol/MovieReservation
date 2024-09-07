@@ -6,9 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,9 +43,13 @@ public class Reservation {
   @JoinColumn(name = "schedule_id")
   private Schedule schedule;
 
-  @ManyToOne
-  @JoinColumn(name = "seat_id")
-  private Seat seat;
+  @ManyToMany
+  @JoinTable(
+      name = "reservation_seat",
+      joinColumns = @JoinColumn(name = "reservation_id"),
+      inverseJoinColumns = @JoinColumn(name = "seat_id")
+  )
+  private List<Seat> seats;
 
   private String cancel;
 
@@ -52,4 +59,5 @@ public class Reservation {
   private LocalDateTime createdAt;
 
   private LocalDateTime canceledAt;
+
 }
