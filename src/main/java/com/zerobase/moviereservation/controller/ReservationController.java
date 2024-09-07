@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,11 +31,11 @@ public class ReservationController {
     return ResponseEntity.ok(responses);
   }
 
-  @PutMapping("/cancel")
-  public ResponseEntity<List<ReservationDto>> cancelReservations(
-      @RequestParam("userId") Long userId,
-      @RequestParam("scheduleId") Long scheduleId
+  @PutMapping("/cancel/{reservationId}")
+  public ResponseEntity<ReservationDto> cancelReservation(
+      @PathVariable("reservationId") Long reservationId,
+      @RequestParam("userId") Long userId
   ) {
-    return ResponseEntity.ok(reservationService.canceledReservation(userId, scheduleId));
+    return ResponseEntity.ok(reservationService.canceledReservation(userId, reservationId));
   }
 }
