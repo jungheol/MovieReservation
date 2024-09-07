@@ -14,6 +14,7 @@ public enum ErrorCode {
   USER_NOT_FOUND("U_01", "회원을 찾을 수 없습니다."),
   ALREADY_EXISTED_EMAIL("U_02", "이미 가입된 이메일입니다."),
   PASSWORD_NOT_MATCHED("U_03", "비밀번호가 틀렸습니다."),
+  AUTHORIZATION_ERROR("U_04", "접근 권한이 없습니다."),
 
   // theater error
   ALREADY_EXISTED_THEATERNAME("T_01", "이미 존재하는 영화관 이름입니다."),
@@ -30,7 +31,8 @@ public enum ErrorCode {
   // reservation error
   ALREADY_EXISTED_RESERVATION("R_01", "이미 예약된 좌석입니다."),
   RESERVATION_NOT_FOUND("R_02", "해당 예약을 찾을 수 없습니다."),
-  SEAT_NOT_VALID("R_03", "해당 좌석은 유효하지 않습니다.");
+  SEAT_NOT_VALID("R_03", "해당 좌석은 유효하지 않습니다."),
+  ALREADY_CANCELED_RESERVATION("R_04", "해당 예약은 이미 취소된 예약입니다.");
 
 
   private final String code;

@@ -8,5 +8,5 @@ public interface ReservationService {
 
   List<ReservationDto> registerReservation(RegisterReservationDto.Request request);
 
-  List<ReservationDto> canceledReservation(Long userId, Long scheduleId);
+  public ReservationDto canceledReservation(Long userId, Long reservationId);
 }

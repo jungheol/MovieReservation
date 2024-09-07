@@ -1,6 +1,8 @@
 package com.zerobase.moviereservation.service;
 
+import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_CANCELED_RESERVATION;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_RESERVATION;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.AUTHORIZATION_ERROR;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SEAT_NOT_VALID;
@@ -66,27 +68,25 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
-  public List<ReservationDto> canceledReservation(Long userId, Long scheduleId) {
-    List<Reservation> activeReservations = reservationRepository.findByUserIdAndScheduleId(userId,
-        scheduleId).stream().filter(reservation -> "N".equals(reservation.getCancel())).toList();
+  public ReservationDto canceledReservation(Long userId, Long reservationId) {
+    Reservation reservation = reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new CustomException(RESERVATION_NOT_FOUND));
 
-    // scheduleId & seatId 가 있고, cancel == "N" 이 없을 때
-    if (activeReservations.isEmpty()) {
-      throw new CustomException(RESERVATION_NOT_FOUND);
+    // 예약자와 예약내용이 일치하지 않을 때
+    if (!reservation.getUser().getId().equals(userId)) {
+      throw new CustomException(AUTHORIZATION_ERROR);
+    }
+
+    // 이미 취소된 예약인 경우
+    if ("Y".equals(reservation.getCancel())) {
+      throw new CustomException(ALREADY_CANCELED_RESERVATION);
     }
 
     // 예약의 취소 상태를 업데이트합니다.
-    activeReservations.forEach(reservation -> {
-      reservation.setCancel("Y");
-      reservation.setReserved("N");
-      reservation.setCanceledAt(LocalDateTime.now());
-    });
+    reservation.setCancel("Y");
+    reservation.setReserved("N");
+    reservation.setCanceledAt(LocalDateTime.now());
 
-    List<Reservation> canceledReservations = reservationRepository.saveAll(activeReservations);
-
-    return canceledReservations.stream()
-        .filter(reservation -> "Y".equals(reservation.getCancel()))
-        .map(ReservationDto::fromEntity)
-        .collect(Collectors.toList());
+    return ReservationDto.fromEntity(reservationRepository.save(reservation));
   }
 }
