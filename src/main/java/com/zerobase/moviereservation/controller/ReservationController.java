@@ -1,7 +1,6 @@
 package com.zerobase.moviereservation.controller;
 
 import com.zerobase.moviereservation.model.dto.RegisterReservationDto;
-import com.zerobase.moviereservation.model.dto.RegisterReservationDto.Response;
 import com.zerobase.moviereservation.model.dto.ReservationDto;
 import com.zerobase.moviereservation.service.ReservationService;
 import java.util.List;
@@ -23,13 +22,12 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @PostMapping
-  public List<Response> registerReservations(
-      @RequestBody RegisterReservationDto.Request request
-  ) {
-    List<ReservationDto> reservationDtos = this.reservationService.registerReservation(request);
-    return reservationDtos.stream()
-        .map(RegisterReservationDto.Response::from)
+  public ResponseEntity<List<RegisterReservationDto.Response>> registerReservation(
+      @RequestBody RegisterReservationDto.Request request) {
+    List<RegisterReservationDto.Response> responses = reservationService.registerReservation(request)
+        .stream().map(RegisterReservationDto.Response::from)
         .collect(Collectors.toList());
+    return ResponseEntity.ok(responses);
   }
 
   @PutMapping("/cancel")
