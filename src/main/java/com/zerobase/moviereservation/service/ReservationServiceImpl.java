@@ -43,8 +43,9 @@ public class ReservationServiceImpl implements ReservationService {
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
-    if (!this.reservationRepository.findByScheduleIdAndSeatIdIn(
-        schedule.getId(), request.getSeatIds()).isEmpty()) {
+    // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
+    if (this.reservationRepository.findByScheduleIdAndSeatIdIn(schedule.getId(),
+        request.getSeatIds()).stream().anyMatch(r -> "N".equals(r.getCancel()))) {
       throw new CustomException(ALREADY_EXISTED_RESERVATION);
     }
 
@@ -53,40 +54,38 @@ public class ReservationServiceImpl implements ReservationService {
       throw new CustomException(SEAT_NOT_VALID);
     }
 
-    List<Reservation> reservations = seats.stream()
-        .map(seat -> Reservation.builder()
-            .user(user)
-            .schedule(schedule)
-            .seat(seat)
-            .cancel(request.getCancel())
-            .reserved(request.getReserved())
-            .build())
+    List<Reservation> reservations = seats.stream().map(
+            seat -> Reservation.builder().user(user).schedule(schedule).seat(seat)
+                .cancel(request.getCancel()).reserved(request.getReserved()).build())
         .collect(Collectors.toList());
 
     List<Reservation> savedReservations = reservationRepository.saveAll(reservations);
 
-    return savedReservations.stream()
-        .map(ReservationDto::fromEntity)
-        .collect(Collectors.toList());
+    return savedReservations.stream().map(ReservationDto::fromEntity).collect(Collectors.toList());
   }
 
   @Override
   @Transactional
   public List<ReservationDto> canceledReservation(Long userId, Long scheduleId) {
-    List<Reservation> reservations = reservationRepository.findByUserIdAndScheduleId(userId, scheduleId);
+    List<Reservation> activeReservations = reservationRepository.findByUserIdAndScheduleId(userId,
+        scheduleId).stream().filter(reservation -> "N".equals(reservation.getCancel())).toList();
 
-    if (reservations.isEmpty()) {
+    // scheduleId & seatId 가 있고, cancel == "N" 이 없을 때
+    if (activeReservations.isEmpty()) {
       throw new CustomException(RESERVATION_NOT_FOUND);
     }
-    reservations.forEach(reservation -> {
+
+    // 예약의 취소 상태를 업데이트합니다.
+    activeReservations.forEach(reservation -> {
       reservation.setCancel("Y");
       reservation.setReserved("N");
       reservation.setCanceledAt(LocalDateTime.now());
     });
 
-    List<Reservation> canceledReservations = reservationRepository.saveAll(reservations);
+    List<Reservation> canceledReservations = reservationRepository.saveAll(activeReservations);
 
     return canceledReservations.stream()
+        .filter(reservation -> "Y".equals(reservation.getCancel()))
         .map(ReservationDto::fromEntity)
         .collect(Collectors.toList());
   }
