@@ -1,8 +1,8 @@
 package com.zerobase.moviereservation.model.dto;
 
 import com.zerobase.moviereservation.entity.Reservation;
-import com.zerobase.moviereservation.entity.Seat;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,14 +25,16 @@ public class ReservationDto {
   private String reserved;
 
   public static ReservationDto fromEntity(Reservation reservation) {
-    Seat seat = reservation.getSeat();
-    String seatInfo = seat.getRowChar() + "-" + seat.getColNum();
+    List<String> seatInfoList = reservation.getSeats().stream()
+        .map(seat -> seat.getRowChar() + "-" + seat.getColNum())
+        .collect(Collectors.toList());
+
     return ReservationDto.builder()
         .id(reservation.getId())
         .username(reservation.getUser().getUsername())
         .movieTitle(reservation.getSchedule().getMovie().getTitle())
         .theaterName(reservation.getSchedule().getTheater().getTheaterName())
-        .seats(List.of(seatInfo))
+        .seats(seatInfoList)
         .cancel(reservation.getCancel())
         .reserved(reservation.getReserved())
         .build();
