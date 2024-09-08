@@ -55,15 +55,15 @@ public class ReservationServiceImpl implements ReservationService {
       throw new CustomException(SEAT_NOT_VALID);
     }
 
-    Reservation reservation = Reservation.builder()
+    Reservation reservation = this.reservationRepository.save(Reservation.builder()
         .user(user)
         .schedule(schedule)
         .seats(seats)
         .cancel(request.getCancel())
         .reserved(request.getReserved())
-        .build();
+        .build());
 
-    return List.of(ReservationDto.fromEntity(reservationRepository.save(reservation)));
+    return List.of(ReservationDto.fromEntity(reservation));
   }
 
   @Override
@@ -88,5 +88,21 @@ public class ReservationServiceImpl implements ReservationService {
     reservation.setCanceledAt(LocalDateTime.now());
 
     return ReservationDto.fromEntity(reservationRepository.save(reservation));
+  }
+
+  @Override
+  public List<ReservationDto> getAllReservation(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    List<Reservation> reservations = reservationRepository.findByUserId(userId);
+
+    if (reservations.isEmpty()) {
+      throw new CustomException(RESERVATION_NOT_FOUND);
+    }
+
+    return reservations.stream()
+        .map(ReservationDto::fromEntity)
+        .collect(Collectors.toList());
   }
 }

@@ -23,4 +23,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
       @Param("userId") Long userId,
       @Param("scheduleId") Long scheduleId
   );
+
+  List<Reservation> findByUserId(Long userId);
 }
