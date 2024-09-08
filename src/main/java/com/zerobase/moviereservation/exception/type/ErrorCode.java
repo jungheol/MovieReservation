@@ -29,10 +29,11 @@ public enum ErrorCode {
   SCHEDULE_NOT_FOUND("S_02", "해당 스케쥴을 찾을 수 없습니다."),
 
   // reservation error
-  ALREADY_EXISTED_RESERVATION("R_01", "이미 예약된 좌석입니다."),
+  ALREADY_EXISTED_RESERVATION("R_01", "이미 존재하는 예약입니다."),
   RESERVATION_NOT_FOUND("R_02", "해당 예약을 찾을 수 없습니다."),
   SEAT_NOT_VALID("R_03", "해당 좌석은 유효하지 않습니다."),
-  ALREADY_CANCELED_RESERVATION("R_04", "해당 예약은 이미 취소된 예약입니다.");
+  ALREADY_CANCELED_RESERVATION("R_04", "해당 예약은 이미 취소된 예약입니다."),
+  ALREADY_RESERVED_SEAT("R_05", "이미 선점된 좌석입니다.");
 
 
   private final String code;

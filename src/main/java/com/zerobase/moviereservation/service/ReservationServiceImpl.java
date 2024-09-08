@@ -2,6 +2,7 @@ package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_CANCELED_RESERVATION;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_RESERVATION;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_RESERVED_SEAT;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.AUTHORIZATION_ERROR;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
@@ -21,6 +22,7 @@ import com.zerobase.moviereservation.repository.SeatRepository;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class ReservationServiceImpl implements ReservationService {
   private final ReservationRepository reservationRepository;
   private final ScheduleRepository scheduleRepository;
   private final SeatRepository seatRepository;
+  private final RedisLockService redisLockService;
 
   @Override
   @Transactional
@@ -44,26 +47,39 @@ public class ReservationServiceImpl implements ReservationService {
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
-    // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
-    if (this.reservationRepository.findByScheduleIdAndSeatsIdIn(schedule.getId(),
-        request.getSeatIds()).stream().anyMatch(r -> "N".equals(r.getCancel()))) {
-      throw new CustomException(ALREADY_EXISTED_RESERVATION);
+    String lockKey = "reservation_lock:" + request.getScheduleId() + ":" + request.getSeatIds();
+    String lockValue = UUID.randomUUID().toString();
+
+    boolean isLocked = redisLockService.lock(lockKey, lockValue, 5);
+
+    if (!isLocked) {
+      throw new CustomException(ALREADY_RESERVED_SEAT);
     }
 
-    List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
-    if (seats.size() != request.getSeatIds().size()) {
-      throw new CustomException(SEAT_NOT_VALID);
+    try {
+      // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
+      if (this.reservationRepository.findByScheduleIdAndSeatsIdIn(schedule.getId(),
+          request.getSeatIds()).stream().anyMatch(r -> "N".equals(r.getCancel()))) {
+        throw new CustomException(ALREADY_EXISTED_RESERVATION);
+      }
+
+      List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
+      if (seats.size() != request.getSeatIds().size()) {
+        throw new CustomException(SEAT_NOT_VALID);
+      }
+
+      Reservation reservation = this.reservationRepository.save(Reservation.builder()
+          .user(user)
+          .schedule(schedule)
+          .seats(seats)
+          .cancel(request.getCancel())
+          .reserved(request.getReserved())
+          .build());
+
+      return List.of(ReservationDto.fromEntity(reservation));
+    } finally {
+      redisLockService.unlock(lockKey, lockValue);
     }
-
-    Reservation reservation = this.reservationRepository.save(Reservation.builder()
-        .user(user)
-        .schedule(schedule)
-        .seats(seats)
-        .cancel(request.getCancel())
-        .reserved(request.getReserved())
-        .build());
-
-    return List.of(ReservationDto.fromEntity(reservation));
   }
 
   @Override
