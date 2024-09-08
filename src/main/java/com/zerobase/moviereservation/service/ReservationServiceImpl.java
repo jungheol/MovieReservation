@@ -22,9 +22,10 @@ import com.zerobase.moviereservation.repository.SeatRepository;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,20 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public List<ReservationDto> registerReservation(Request request) {
-    User user = userRepository.findById(request.getUserId())
+    // 인증된 사용자의 이메일 가져오기
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    User user = userRepository.findByEmail(userDetails.getUsername())
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    Long authenticatedUserId = user.getId();
+
+    // 예약하려는 userId와 인증된 사용자의 userId가 다를 경우 예외 발생
+    if (!authenticatedUserId.equals(request.getUserId())) {
+      throw new CustomException(AUTHORIZATION_ERROR);
+    }
+
+    user = userRepository.findById(request.getUserId())
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
