@@ -6,6 +6,7 @@ import com.zerobase.moviereservation.entity.Payment;
 import com.zerobase.moviereservation.entity.Reservation;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.exception.type.ErrorCode;
+import com.zerobase.moviereservation.model.type.PaymentType;
 import com.zerobase.moviereservation.repository.PaymentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     Payment payment = Payment.builder()
         .reservation(reservation)
         .amount(amount)
-        .status("success")
+        .status(PaymentType.S)
         .build();
 
     return paymentRepository.save(payment);

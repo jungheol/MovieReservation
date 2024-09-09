@@ -1,5 +1,7 @@
 package com.zerobase.moviereservation.model.dto;
 
+import com.zerobase.moviereservation.model.type.CancelType;
+import com.zerobase.moviereservation.model.type.ReservedType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +19,8 @@ public class RegisterReservationDto {
     private Long userId;
     private Long scheduleId;
     private List<Long> seatIds;
-    private String cancel;
-    private String reserved;
+    private CancelType cancel;
+    private ReservedType reserved;
   }
 
   @Data
@@ -31,8 +33,8 @@ public class RegisterReservationDto {
     private String movieTitle;
     private String theaterName;
     private List<String> seats;
-    private String cancel;
-    private String reserved;
+    private CancelType cancel;
+    private ReservedType reserved;
 
     public static Response from(ReservationDto reservationDto) {
       return Response.builder()

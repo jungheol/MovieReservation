@@ -1,6 +1,8 @@
 package com.zerobase.moviereservation.model.dto;
 
 import com.zerobase.moviereservation.entity.Reservation;
+import com.zerobase.moviereservation.model.type.CancelType;
+import com.zerobase.moviereservation.model.type.ReservedType;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -21,8 +23,8 @@ public class ReservationDto {
   private String movieTitle;
   private String theaterName;
   private List<String> seats;
-  private String cancel;
-  private String reserved;
+  private CancelType cancel;
+  private ReservedType reserved;
 
   public static ReservationDto fromEntity(Reservation reservation) {
     List<String> seatInfoList = reservation.getSeats().stream()

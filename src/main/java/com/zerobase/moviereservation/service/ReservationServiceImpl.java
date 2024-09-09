@@ -19,6 +19,8 @@ import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterReservationDto.Request;
 import com.zerobase.moviereservation.model.dto.ReservationDto;
+import com.zerobase.moviereservation.model.type.CancelType;
+import com.zerobase.moviereservation.model.type.ReservedType;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
 import com.zerobase.moviereservation.repository.SeatRepository;
@@ -83,7 +85,7 @@ public class ReservationServiceImpl implements ReservationService {
     try {
       // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
       if (this.reservationRepository.findByScheduleIdAndSeatsIdIn(schedule.getId(),
-          request.getSeatIds()).stream().anyMatch(r -> "N".equals(r.getCancel()))) {
+          request.getSeatIds()).stream().anyMatch(r -> CancelType.N.equals(r.getCancel()))) {
         throw new CustomException(ALREADY_EXISTED_RESERVATION);
       }
 
@@ -133,13 +135,13 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     // 이미 취소된 예약인 경우
-    if ("Y".equals(reservation.getCancel())) {
+    if (CancelType.Y.equals(reservation.getCancel())) {
       throw new CustomException(ALREADY_CANCELED_RESERVATION);
     }
 
     // 예약의 취소 상태를 업데이트합니다.
-    reservation.setCancel("Y");
-    reservation.setReserved("N");
+    reservation.setCancel(CancelType.Y);
+    reservation.setReserved(ReservedType.N);
     reservation.setCanceledAt(LocalDateTime.now());
 
     return ReservationDto.fromEntity(reservationRepository.save(reservation));

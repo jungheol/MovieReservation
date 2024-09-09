@@ -1,7 +1,11 @@
 package com.zerobase.moviereservation.entity;
 
+import com.zerobase.moviereservation.model.type.CancelType;
+import com.zerobase.moviereservation.model.type.ReservedType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,7 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -51,9 +54,11 @@ public class Reservation {
   )
   private List<Seat> seats;
 
-  private String cancel;
+  @Enumerated(EnumType.STRING)
+  private CancelType cancel;
 
-  private String reserved;
+  @Enumerated(EnumType.STRING)
+  private ReservedType reserved;
 
   @CreatedDate
   private LocalDateTime createdAt;

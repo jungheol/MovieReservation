@@ -1,6 +1,9 @@
 package com.zerobase.moviereservation.entity;
 
+import com.zerobase.moviereservation.model.type.PaymentType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +35,7 @@ public class Payment extends BaseTimeEntity {
 
   private Integer amount;
 
-  private String status;
+  @Enumerated(EnumType.STRING)
+  private PaymentType status;
 
 }
