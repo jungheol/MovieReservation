@@ -68,10 +68,16 @@ public class ReservationServiceImpl implements ReservationService {
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
-    String lockKey = "reservation_lock:" + request.getScheduleId() + ":" + request.getSeatIds();
+    for (Long seatId : request.getSeatIds()) {
+      String seatLockKey = "seat_lock:" + seatId;
+      if (!redisLockService.lock(seatLockKey, 10)) {
+        throw new CustomException(ALREADY_RESERVED_SEAT);
+      }
+    }
 
-    if (!redisLockService.lock(lockKey, 5)) {
-      throw new CustomException(ALREADY_RESERVED_SEAT);
+    String scheduleLockKey = "schedule_lock:" + schedule.getId();
+    if (!redisLockService.lock(scheduleLockKey, 10)) {
+      throw new CustomException(ALREADY_EXISTED_SCHEDULE);
     }
 
     try {
@@ -103,7 +109,10 @@ public class ReservationServiceImpl implements ReservationService {
       return List.of(ReservationDto.fromEntity(reservation));
 
     } finally {
-      redisLockService.unlock(lockKey);
+      for (Long seatId : request.getSeatIds()) {
+        redisLockService.unlock("seat_lock:" + seatId);
+      }
+      redisLockService.unlock("schedule_lock:" + schedule.getId());
     }
   }
 
