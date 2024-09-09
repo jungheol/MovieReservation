@@ -4,7 +4,9 @@ import com.zerobase.moviereservation.entity.Schedule;
 import com.zerobase.moviereservation.entity.Theater;
 import java.time.LocalTime;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
   boolean existsByTheaterIdAndStartTime(Long theaterId, LocalTime startTime);
