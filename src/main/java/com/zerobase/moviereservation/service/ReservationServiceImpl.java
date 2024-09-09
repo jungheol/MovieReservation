@@ -20,6 +20,7 @@ import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterReservationDto.Request;
 import com.zerobase.moviereservation.model.dto.ReservationDto;
 import com.zerobase.moviereservation.model.type.CancelType;
+import com.zerobase.moviereservation.model.type.PaymentType;
 import com.zerobase.moviereservation.model.type.ReservedType;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
@@ -98,13 +99,13 @@ public class ReservationServiceImpl implements ReservationService {
           .user(user)
           .schedule(schedule)
           .seats(seats)
-          .cancel(request.getCancel())
-          .reserved(request.getReserved())
+          .cancel(CancelType.N)
+          .reserved(ReservedType.Y)
           .build());
 
       Integer amount = calculateAmount(schedule, seats);
       Payment payment = paymentService.processPayment(reservation, amount);
-      if (!"success".equals(payment.getStatus())) {
+      if (!PaymentType.S.equals(payment.getStatus())) {
         throw new CustomException(PAYMENT_FAILED);
       }
 
