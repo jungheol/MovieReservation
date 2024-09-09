@@ -37,6 +37,12 @@ public class MovieServiceImpl implements MovieService {
   }
 
   @Override
+  public MovieDto getMovie(Long movieId) {
+    return MovieDto.fromEntity(movieRepository.findById(movieId)
+        .orElseThrow(() -> new CustomException(MOVIE_NOT_FOUND)));
+  }
+
+  @Override
   @Transactional
   public void deleteMovie(Long movieId) {
     Movie movie = this.movieRepository.findById(movieId)

@@ -7,5 +7,7 @@ public interface MovieService {
 
   MovieDto registerMovie(RegisterMovieDto.Request request);
 
+  MovieDto getMovie(Long movieId);
+
   void deleteMovie(Long movieId);
 }
