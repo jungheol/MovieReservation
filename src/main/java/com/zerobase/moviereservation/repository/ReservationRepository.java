@@ -1,6 +1,7 @@
 package com.zerobase.moviereservation.repository;
 
 import com.zerobase.moviereservation.entity.Reservation;
+import com.zerobase.moviereservation.entity.Seat;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
   );
 
   List<Reservation> findByUserId(Long userId);
+
+  @Query("SELECT s FROM Reservation r JOIN r.seats s WHERE r.schedule.id = :scheduleId AND r.cancel = 'N'")
+  List<Seat> findReservedSeatsByScheduleId(@Param("scheduleId") Long scheduleId);
 }

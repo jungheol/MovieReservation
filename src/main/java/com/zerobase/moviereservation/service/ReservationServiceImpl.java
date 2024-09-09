@@ -25,7 +25,6 @@ import com.zerobase.moviereservation.repository.SeatRepository;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
