@@ -14,6 +14,8 @@ import com.zerobase.moviereservation.model.dto.UpdateScheduleDto;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
 import com.zerobase.moviereservation.repository.TheaterRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +50,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         .build());
 
     return ScheduleDto.fromEntity(schedule);
+  }
+
+  @Override
+  public List<ScheduleDto> getSchedulesByMovieId(Long movieId) {
+    return scheduleRepository.findByMovieId(movieId).stream()
+        .map(ScheduleDto::fromEntity)
+        .collect(Collectors.toList());
   }
 
   @Override

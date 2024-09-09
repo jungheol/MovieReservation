@@ -1,12 +1,15 @@
 package com.zerobase.moviereservation.controller;
 
 import com.zerobase.moviereservation.model.dto.RegisterScheduleDto;
+import com.zerobase.moviereservation.model.dto.ScheduleDto;
 import com.zerobase.moviereservation.model.dto.UpdateScheduleDto;
 import com.zerobase.moviereservation.service.ScheduleService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +27,13 @@ public class ScheduleController {
   @PostMapping
   public RegisterScheduleDto.Response register(@RequestBody RegisterScheduleDto.Request request) {
     return RegisterScheduleDto.Response.from(this.scheduleService.registerSchedule(request));
+  }
+
+  @GetMapping("/by-movie/{movieId}")
+  public List<ScheduleDto> getSchedulesByMovieId(
+      @PathVariable("movieId") Long movieId
+  ) {
+    return scheduleService.getSchedulesByMovieId(movieId);
   }
 
   @PutMapping("/{scheduleId}")
