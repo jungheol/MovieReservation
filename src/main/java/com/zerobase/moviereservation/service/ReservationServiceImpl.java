@@ -2,6 +2,7 @@ package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_CANCELED_RESERVATION;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_RESERVATION;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_SCHEDULE;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_RESERVED_SEAT;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.AUTHORIZATION_ERROR;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.PAYMENT_FAILED;
