@@ -37,4 +37,7 @@ public class Schedule extends BaseTimeEntity {
 
   private LocalTime startTime;
 
+  public Integer getPricePerSeat() {
+    return 10000;
+  }
 }

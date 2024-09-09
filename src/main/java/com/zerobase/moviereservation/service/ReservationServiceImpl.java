@@ -4,11 +4,13 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_CAN
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_RESERVATION;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_RESERVED_SEAT;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.AUTHORIZATION_ERROR;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.PAYMENT_FAILED;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SEAT_NOT_VALID;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.USER_NOT_FOUND;
 
+import com.zerobase.moviereservation.entity.Payment;
 import com.zerobase.moviereservation.entity.Reservation;
 import com.zerobase.moviereservation.entity.Schedule;
 import com.zerobase.moviereservation.entity.Seat;
@@ -22,6 +24,7 @@ import com.zerobase.moviereservation.repository.SeatRepository;
 import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,12 +41,16 @@ public class ReservationServiceImpl implements ReservationService {
   private final ScheduleRepository scheduleRepository;
   private final SeatRepository seatRepository;
   private final RedisLockService redisLockService;
+  private final PaymentService paymentService;
 
   @Override
   @Transactional
   public List<ReservationDto> registerReservation(Request request) {
     // 인증된 사용자의 이메일 가져오기
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails) SecurityContextHolder
+        .getContext()
+        .getAuthentication()
+        .getPrincipal();
 
     User user = userRepository.findByEmail(userDetails.getUsername())
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -62,11 +69,8 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
     String lockKey = "reservation_lock:" + request.getScheduleId() + ":" + request.getSeatIds();
-    String lockValue = UUID.randomUUID().toString();
 
-    boolean isLocked = redisLockService.lock(lockKey, lockValue, 5);
-
-    if (!isLocked) {
+    if (!redisLockService.lock(lockKey, 5)) {
       throw new CustomException(ALREADY_RESERVED_SEAT);
     }
 
@@ -90,10 +94,22 @@ public class ReservationServiceImpl implements ReservationService {
           .reserved(request.getReserved())
           .build());
 
+      Integer amount = calculateAmount(schedule, seats);
+      Payment payment = paymentService.processPayment(reservation, amount);
+      if (!"success".equals(payment.getStatus())) {
+        throw new CustomException(PAYMENT_FAILED);
+      }
+
       return List.of(ReservationDto.fromEntity(reservation));
+
     } finally {
-      redisLockService.unlock(lockKey, lockValue);
+      redisLockService.unlock(lockKey);
     }
+  }
+
+  private Integer calculateAmount(Schedule schedule, List<Seat> seats) {
+    // 예: 각 좌석의 기본 금액에 추가 요금을 더하는 방식
+    return seats.size() * schedule.getPricePerSeat();
   }
 
   @Override

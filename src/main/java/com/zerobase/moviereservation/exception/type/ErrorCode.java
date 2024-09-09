@@ -33,7 +33,10 @@ public enum ErrorCode {
   RESERVATION_NOT_FOUND("R_02", "해당 예약을 찾을 수 없습니다."),
   SEAT_NOT_VALID("R_03", "해당 좌석은 유효하지 않습니다."),
   ALREADY_CANCELED_RESERVATION("R_04", "해당 예약은 이미 취소된 예약입니다."),
-  ALREADY_RESERVED_SEAT("R_05", "이미 선점된 좌석입니다.");
+  ALREADY_RESERVED_SEAT("R_05", "이미 선점된 좌석입니다."),
+
+  // payment error
+  PAYMENT_FAILED("P_01", "결제에 실패했습니다.");
 
 
   private final String code;
