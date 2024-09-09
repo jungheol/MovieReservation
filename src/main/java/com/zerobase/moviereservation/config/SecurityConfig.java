@@ -4,6 +4,7 @@ import com.zerobase.moviereservation.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,7 +27,9 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authorizeHttpRequests(
-            authorizeRequests -> authorizeRequests.requestMatchers("/auth/**").permitAll()
+            authorizeRequests -> authorizeRequests.requestMatchers("/auth/**", "/reservations/**", "/seats/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/movies/**").hasRole("USER")
+                .requestMatchers(HttpMethod.GET, "/schedules/**").hasRole("USER")
                 .requestMatchers("/theaters/**").hasRole("OWNER")
                 .requestMatchers("/movies/**").hasRole("OWNER")
                 .requestMatchers("/schedules/**").hasRole("OWNER")

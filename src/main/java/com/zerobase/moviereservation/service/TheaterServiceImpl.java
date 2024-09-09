@@ -3,12 +3,16 @@ package com.zerobase.moviereservation.service;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_THEATERNAME;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.THEATER_NOT_FOUND;
 
+import com.zerobase.moviereservation.entity.Seat;
 import com.zerobase.moviereservation.entity.Theater;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterTheaterDto.Request;
 import com.zerobase.moviereservation.model.dto.TheaterDto;
 import com.zerobase.moviereservation.model.dto.UpdateTheaterDto;
+import com.zerobase.moviereservation.repository.SeatRepository;
 import com.zerobase.moviereservation.repository.TheaterRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TheaterServiceImpl implements TheaterService {
 
   private final TheaterRepository theaterRepository;
+  private final SeatRepository seatRepository;
 
   @Override
   @Transactional
@@ -31,6 +36,19 @@ public class TheaterServiceImpl implements TheaterService {
         .address(request.getAddress())
         .seatCount(request.getSeatCount())
         .build());
+
+    List<Seat> seats = new ArrayList<>();
+    for (char row = 'A'; row <= 'J'; row++) {
+      for (int col = 1; col <= 10; col++) {
+        Seat seat = new Seat();
+        seat.setTheater(theater);
+        seat.setRowChar(String.valueOf(row));
+        seat.setColNum(col);
+        seats.add(seat);
+      }
+    }
+
+    seatRepository.saveAll(seats);
 
     return TheaterDto.fromEntity(theater);
   }

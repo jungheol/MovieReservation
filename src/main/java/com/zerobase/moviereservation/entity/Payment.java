@@ -1,13 +1,15 @@
 package com.zerobase.moviereservation.entity;
 
-import jakarta.persistence.CascadeType;
+import com.zerobase.moviereservation.model.type.PaymentType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,22 +19,23 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "theater")
-public class Theater extends BaseTimeEntity {
+@Builder
+@Table(name = "payment")
+public class Payment extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String theaterName;
+  @OneToOne
+  @JoinColumn(name = "reservation_id")
+  private Reservation reservation;
 
-  private String address;
+  private Integer amount;
 
-  private int seatCount;
+  @Enumerated(EnumType.STRING)
+  private PaymentType status;
 
-  @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Seat> seats;
 }
