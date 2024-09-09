@@ -34,7 +34,7 @@ public class ReservationController {
     return ResponseEntity.ok(responses);
   }
 
-  @PatchMapping("/cancel/{reservationId}")
+  @PatchMapping("/{reservationId}/users/{userId}/cancel")
   public ResponseEntity<ReservationDto> cancelReservation(
       @PathVariable("reservationId") Long reservationId,
       @RequestParam("userId") Long userId
