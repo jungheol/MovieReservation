@@ -4,6 +4,7 @@ import com.zerobase.moviereservation.model.document.MovieDocument;
 import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface MovieService {
 
@@ -11,9 +12,9 @@ public interface MovieService {
 
   MovieDto getMovie(Long movieId);
 
-  List<MovieDocument> searchMoviesByTitle(String title);
+  Page<MovieDocument> searchMoviesByTitle(String title, int page, int size);
 
-  List<MovieDocument> searchMoviesByGenre(String genre);
+  Page<MovieDocument> searchMoviesByGenre(String genre, int page, int size);
 
   void deleteMovie(Long movieId);
 }

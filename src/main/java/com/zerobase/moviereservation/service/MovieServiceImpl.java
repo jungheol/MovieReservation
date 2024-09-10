@@ -12,6 +12,9 @@ import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.document.SearchMovieRepository;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,20 +45,26 @@ public class MovieServiceImpl implements MovieService {
   }
 
   @Override
-  public List<MovieDocument> searchMoviesByTitle(String title) {
-    List<MovieDocument> movies = searchMovieRepository.findByTitleContaining(title);
+  public Page<MovieDocument> searchMoviesByTitle(String title, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<MovieDocument> movies = searchMovieRepository.findByTitleContaining(title, pageable);
+
     if (movies.isEmpty()) {
       throw new CustomException(MOVIE_NOT_FOUND);
     }
+
     return movies;
   }
 
   @Override
-  public List<MovieDocument> searchMoviesByGenre(String genre) {
-    List<MovieDocument> movies = searchMovieRepository.findByGenreContaining(genre);
+  public Page<MovieDocument> searchMoviesByGenre(String genre, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<MovieDocument> movies = searchMovieRepository.findByGenreContaining(genre, pageable);
+
     if (movies.isEmpty()) {
       throw new CustomException(MOVIE_NOT_FOUND);
     }
+
     return movies;
   }
 

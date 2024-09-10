@@ -6,6 +6,7 @@ import com.zerobase.moviereservation.model.dto.RegisterMovieDto;
 import com.zerobase.moviereservation.service.MovieService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,17 +39,21 @@ public class MovieController {
   }
 
   @GetMapping("/search/title")
-  public List<MovieDocument> searchMoviesByTitle(
-      @RequestParam("title") String title
+  public Page<MovieDocument> searchMoviesByTitle(
+      @RequestParam("title") String title,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "5") int size
   ) {
-    return movieService.searchMoviesByTitle(title);
+    return movieService.searchMoviesByTitle(title, page, size);
   }
 
   @GetMapping("/search/genre")
-  public List<MovieDocument> searchMoviesByGenre(
-      @RequestParam("genre") String genre
+  public Page<MovieDocument> searchMoviesByGenre(
+      @RequestParam("genre") String genre,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "5") int size
   ) {
-    return movieService.searchMoviesByGenre(genre);
+    return movieService.searchMoviesByGenre(genre, page, size);
   }
 
   @DeleteMapping("/{movieId}")
