@@ -4,10 +4,13 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXI
 import static com.zerobase.moviereservation.exception.type.ErrorCode.MOVIE_NOT_FOUND;
 
 import com.zerobase.moviereservation.entity.Movie;
+import com.zerobase.moviereservation.model.document.MovieDocument;
 import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto.Request;
 import com.zerobase.moviereservation.repository.MovieRepository;
+import com.zerobase.moviereservation.repository.document.SearchMovieRepository;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MovieServiceImpl implements MovieService {
 
   private final MovieRepository movieRepository;
+  private final SearchMovieRepository searchMovieRepository;
 
   @Override
   @Transactional
@@ -33,7 +37,30 @@ public class MovieServiceImpl implements MovieService {
         .releaseDate(request.getReleaseDate())
         .build());
 
+    saveDocument(movie);
     return MovieDto.fromEntity(movie);
+  }
+
+  @Override
+  public List<MovieDocument> searchMoviesByTitle(String title) {
+    return searchMovieRepository.findByTitleContaining(title);
+  }
+
+  @Override
+  public List<MovieDocument> searchMoviesByGenre(String genre) {
+    return searchMovieRepository.findByGenreContaining(genre);
+  }
+
+  private MovieDocument saveDocument(Movie movie) {
+    MovieDocument movieDocument = new MovieDocument();
+    movieDocument.setId(movie.getId());
+    movieDocument.setTitle(movie.getTitle());
+    movieDocument.setDirector(movie.getDirector());
+    movieDocument.setGenre(movie.getGenre());
+    movieDocument.setRunningTime(movie.getRunningTime());
+    movieDocument.setReleaseDate(movie.getReleaseDate());
+
+    return searchMovieRepository.save(movieDocument);
   }
 
   @Override
@@ -49,5 +76,6 @@ public class MovieServiceImpl implements MovieService {
         .orElseThrow(() -> new CustomException(MOVIE_NOT_FOUND));
 
     this.movieRepository.delete(movie);
+    this.searchMovieRepository.deleteById(movieId);
   }
 }
