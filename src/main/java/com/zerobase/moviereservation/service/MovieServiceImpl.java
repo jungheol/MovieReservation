@@ -43,12 +43,20 @@ public class MovieServiceImpl implements MovieService {
 
   @Override
   public List<MovieDocument> searchMoviesByTitle(String title) {
-    return searchMovieRepository.findByTitleContaining(title);
+    List<MovieDocument> movies = searchMovieRepository.findByTitleContaining(title);
+    if (movies.isEmpty()) {
+      throw new CustomException(MOVIE_NOT_FOUND);
+    }
+    return movies;
   }
 
   @Override
   public List<MovieDocument> searchMoviesByGenre(String genre) {
-    return searchMovieRepository.findByGenreContaining(genre);
+    List<MovieDocument> movies = searchMovieRepository.findByGenreContaining(genre);
+    if (movies.isEmpty()) {
+      throw new CustomException(MOVIE_NOT_FOUND);
+    }
+    return movies;
   }
 
   private MovieDocument saveDocument(Movie movie) {
