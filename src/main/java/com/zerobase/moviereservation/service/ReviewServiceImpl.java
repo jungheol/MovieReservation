@@ -143,9 +143,9 @@ public class ReviewServiceImpl implements ReviewService {
     Movie movie = schedule.getMovie();
 
     LocalTime startTime = schedule.getStartTime();
-    int runningTime = movie.getRunningTime();
+    int runningMinute = movie.getRunningMinute();
 
-    return startTime.plusMinutes(runningTime);
+    return startTime.plusMinutes(runningMinute);
   }
 
   private void validationUpdateReview(User user, Review review) {

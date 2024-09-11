@@ -19,7 +19,7 @@ public class MovieDto {
   private String title;
   private String director;
   private String genre;
-  private Integer runningTime;
+  private Integer runningMinute;
   private LocalDate releaseDate;
   private Double rating;
 
@@ -29,7 +29,7 @@ public class MovieDto {
         .title(movie.getTitle())
         .director(movie.getDirector())
         .genre(movie.getGenre())
-        .runningTime(movie.getRunningTime())
+        .runningMinute(movie.getRunningMinute())
         .releaseDate(movie.getReleaseDate())
         .rating(movie.getRating())
         .build();
