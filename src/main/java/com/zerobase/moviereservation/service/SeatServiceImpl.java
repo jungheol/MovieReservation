@@ -40,10 +40,10 @@ public class SeatServiceImpl implements SeatService {
         .collect(Collectors.toList());
 
     // 반환할 데이터 구조 생성
-    Map<String, Object> response = new HashMap<>();
-    response.put("scheduleId", scheduleId);
-    response.put("seatList", availableSeats);
+    Map<String, Object> seatMap = new HashMap<>();
+    seatMap.put("scheduleId", scheduleId);
+    seatMap.put("seatList", availableSeats);
 
-    return response;
+    return seatMap;
   }
 }

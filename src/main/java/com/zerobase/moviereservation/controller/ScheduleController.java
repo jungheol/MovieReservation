@@ -25,8 +25,11 @@ public class ScheduleController {
   private final ScheduleService scheduleService;
 
   @PostMapping
-  public RegisterScheduleDto.Response register(@RequestBody RegisterScheduleDto.Request request) {
-    return RegisterScheduleDto.Response.from(this.scheduleService.registerSchedule(request));
+  public RegisterScheduleDto.Response register(
+      @RequestBody RegisterScheduleDto.Request request
+  ) {
+    return RegisterScheduleDto.Response.from(
+        this.scheduleService.registerSchedule(request));
   }
 
   @GetMapping("/by-movie/{movieId}")
@@ -41,7 +44,8 @@ public class ScheduleController {
       @PathVariable("scheduleId") Long scheduleId,
       @RequestBody @Valid UpdateScheduleDto.Request request
   ) {
-    return UpdateScheduleDto.Response.from(this.scheduleService.updateSchedule(scheduleId, request));
+    return UpdateScheduleDto.Response.from(
+        this.scheduleService.updateSchedule(scheduleId, request));
   }
 
   @DeleteMapping("/{scheduleId}")
@@ -51,5 +55,4 @@ public class ScheduleController {
     this.scheduleService.deleteSchedule(scheduleId);
     return ResponseEntity.ok("해당 스케쥴을 삭제했습니다.");
   }
-
 }

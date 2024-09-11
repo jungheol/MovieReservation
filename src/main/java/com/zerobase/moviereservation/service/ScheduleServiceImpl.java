@@ -43,13 +43,11 @@ public class ScheduleServiceImpl implements ScheduleService {
       throw new CustomException(ALREADY_EXISTED_SCHEDULE);
     }
 
-    Schedule schedule = this.scheduleRepository.save(Schedule.builder()
+    return ScheduleDto.fromEntity(this.scheduleRepository.save(Schedule.builder()
         .movie(movie)
         .theater(theater)
         .startTime(request.getStartTime())
-        .build());
-
-    return ScheduleDto.fromEntity(schedule);
+        .build()));
   }
 
   @Override
@@ -86,9 +84,7 @@ public class ScheduleServiceImpl implements ScheduleService {
   @Override
   @Transactional
   public void deleteSchedule(Long scheduleId) {
-    Schedule schedule = this.scheduleRepository.findById(scheduleId)
-        .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
-
-    this.scheduleRepository.delete(schedule);
+    this.scheduleRepository.delete(this.scheduleRepository.findById(scheduleId)
+        .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND)));
   }
 }

@@ -23,7 +23,6 @@ import com.zerobase.moviereservation.model.type.ReservedType;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
 import com.zerobase.moviereservation.repository.SeatRepository;
-import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
-  private final UserRepository userRepository;
   private final ReservationRepository reservationRepository;
   private final ScheduleRepository scheduleRepository;
   private final SeatRepository seatRepository;
@@ -99,11 +97,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
   }
 
-  private Integer calculateAmount(Schedule schedule, List<Seat> seats) {
-    // 예: 각 좌석의 기본 금액에 추가 요금을 더하는 방식
-    return seats.size() * schedule.getPricePerSeat();
-  }
-
   @Override
   @Transactional
   public ReservationDto canceledReservation(Long userId, Long reservationId) {
@@ -138,5 +131,10 @@ public class ReservationServiceImpl implements ReservationService {
     return reservations.stream()
         .map(ReservationDto::fromEntity)
         .collect(Collectors.toList());
+  }
+
+  private Integer calculateAmount(Schedule schedule, List<Seat> seats) {
+    // 좌석당 금액 10000원 책정
+    return seats.size() * schedule.getPricePerSeat();
   }
 }

@@ -1,7 +1,6 @@
 package com.zerobase.moviereservation.repository.document;
 
 import com.zerobase.moviereservation.model.document.MovieDocument;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;

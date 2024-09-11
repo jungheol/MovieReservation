@@ -37,16 +37,14 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     request.setPassword(this.passwordEncoder.encode(request.getPassword()));
 
-    User user = this.userRepository.save(User.builder()
+    return UserDto.fromEntity(this.userRepository.save(User.builder()
         .email(request.getEmail())
         .password(request.getPassword())
         .username(request.getUsername())
         .birthday(request.getBirthday())
         .phoneNumber(request.getPhoneNumber())
         .role(role)
-        .build());
-
-    return UserDto.fromEntity(user);
+        .build()));
   }
 
   public UserDto loginUser(Login.Request request) {
@@ -77,9 +75,8 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public void deleteUser(Long userId) {
-    User authUser = authenticationService.getAuthenticatedUser(userId);
-
-    this.userRepository.delete(authUser);
+    this.userRepository.delete(
+        authenticationService.getAuthenticatedUser(userId));
   }
 
   @Override

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,12 +25,11 @@ public class ReservationController {
 
   @PostMapping
   public ResponseEntity<List<RegisterReservationDto.Response>> registerReservation(
-      @RequestBody RegisterReservationDto.Request request) {
-    List<RegisterReservationDto.Response> responses =
-        reservationService.registerReservation(request)
-            .stream().map(RegisterReservationDto.Response::from)
-            .collect(Collectors.toList());
-    return ResponseEntity.ok(responses);
+      @RequestBody RegisterReservationDto.Request request
+  ) {
+    return ResponseEntity.ok(reservationService.registerReservation(request)
+        .stream().map(RegisterReservationDto.Response::from)
+        .collect(Collectors.toList()));
   }
 
   @PatchMapping("/cancel/{reservationId}")
@@ -39,7 +37,8 @@ public class ReservationController {
       @PathVariable("reservationId") Long reservationId,
       @RequestParam("userId") Long userId
   ) {
-    return ResponseEntity.ok(reservationService.canceledReservation(userId, reservationId));
+    return ResponseEntity.ok(
+        reservationService.canceledReservation(userId, reservationId));
   }
 
   @GetMapping("/users/{userId}")

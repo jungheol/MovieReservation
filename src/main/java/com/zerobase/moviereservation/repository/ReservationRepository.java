@@ -19,14 +19,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
       @Param("seatIds") List<Long> seatIds
   );
 
-  List<Reservation> findByUserIdAndScheduleId(Long userId, Long scheduleId);
-
-  @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.schedule.id = :scheduleId AND r.cancel = 'N'")
-  List<Reservation> findActiveReservationsByUserIdAndScheduleId(
-      @Param("userId") Long userId,
-      @Param("scheduleId") Long scheduleId
-  );
-
   List<Reservation> findByUserId(Long userId);
 
   @Query("SELECT s FROM Reservation r JOIN r.seats s WHERE r.schedule.id = :scheduleId AND r.cancel = 'N'")
