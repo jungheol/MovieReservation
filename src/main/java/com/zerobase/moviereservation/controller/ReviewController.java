@@ -1,11 +1,14 @@
 package com.zerobase.moviereservation.controller;
 
 import com.zerobase.moviereservation.model.dto.RegisterReviewDto;
+import com.zerobase.moviereservation.model.dto.ReviewDto;
 import com.zerobase.moviereservation.model.dto.UpdateReviewDto;
 import com.zerobase.moviereservation.service.ReviewService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +42,13 @@ public class ReviewController {
   ) {
     return UpdateReviewDto.Response.from(
         this.reviewService.updateReview(userId, reviewId, request));
+  }
+
+  @GetMapping("/users/{userId}")
+  public List<ReviewDto> getAllReview(
+      @PathVariable("userId") Long userId
+  ) {
+    return reviewService.getAllReview(userId);
   }
 
   @DeleteMapping("/{reviewId}")
