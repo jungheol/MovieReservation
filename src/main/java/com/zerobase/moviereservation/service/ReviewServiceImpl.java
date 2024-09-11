@@ -107,9 +107,13 @@ public class ReviewServiceImpl implements ReviewService {
     Review review = this.reviewRepository.findById(reviewId)
         .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
+    Movie movie = review.getMovie();
+
     this.reviewRepository.delete(review);
 
-    updateMovieRating(review.getMovie());
+    if (movie != null) {
+      updateMovieRating(movie);
+    }
   }
 
   private void updateMovieRating(Movie movie) {
