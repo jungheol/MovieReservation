@@ -17,7 +17,7 @@ public class RegisterMovieDto {
     private String title;
     private String director;
     private String genre;
-    private String runningTime;
+    private Integer runningTime;
     private LocalDate releaseDate;
   }
 
@@ -30,7 +30,7 @@ public class RegisterMovieDto {
     private String title;
     private String director;
     private String genre;
-    private String runningTime;
+    private Integer runningTime;
     private LocalDate releaseDate;
     private Double rating;
 

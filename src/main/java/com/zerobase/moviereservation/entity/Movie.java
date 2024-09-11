@@ -33,7 +33,7 @@ public class Movie extends BaseTimeEntity {
 
   private String genre;
 
-  private String runningTime;
+  private Integer runningTime;
 
   private LocalDate releaseDate;
 

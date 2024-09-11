@@ -23,7 +23,7 @@ public class MovieDocument {
 
   private String genre;
 
-  private String runningTime;
+  private Integer runningTime;
 
   @Field(type = FieldType.Date, format = DateFormat.basic_date)
   private LocalDate releaseDate;
