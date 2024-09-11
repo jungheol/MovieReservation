@@ -27,17 +27,25 @@ public class AuthController {
   private final TokenProvider tokenProvider;
 
   @PostMapping("/users")
-  public RegisterUserDto.Response registerUser(@RequestBody RegisterUserDto.Request request) {
-    return RegisterUserDto.Response.from(this.authService.registerUser(request, Role.USER));
+  public RegisterUserDto.Response registerUser(
+      @RequestBody RegisterUserDto.Request request
+  ) {
+    return RegisterUserDto.Response.from(
+        this.authService.registerUser(request, Role.USER));
   }
 
   @PostMapping("/owners")
-  public RegisterUserDto.Response registerOwner(@RequestBody RegisterUserDto.Request request) {
-    return RegisterUserDto.Response.from(this.authService.registerUser(request, Role.OWNER));
+  public RegisterUserDto.Response registerOwner(
+      @RequestBody RegisterUserDto.Request request
+  ) {
+    return RegisterUserDto.Response.from(
+        this.authService.registerUser(request, Role.OWNER));
   }
 
   @PostMapping("/login")
-  public ResponseEntity<?> loginUser(@RequestBody @Valid Login.Request request) {
+  public ResponseEntity<?> loginUser(
+      @RequestBody @Valid Login.Request request
+  ) {
     UserDto user = this.authService.loginUser(request);
     return ResponseEntity.ok(
         this.tokenProvider.generateToken(
@@ -49,8 +57,10 @@ public class AuthController {
   @PutMapping("/users/{userId}")
   public UpdateUserDto.Response updateUser(
       @PathVariable("userId") Long userId,
-      @RequestBody @Valid UpdateUserDto.Request request) {
-    return UpdateUserDto.Response.from(this.authService.updateUser(userId, request));
+      @RequestBody @Valid UpdateUserDto.Request request
+  ) {
+    return UpdateUserDto.Response.from(
+        this.authService.updateUser(userId, request));
   }
 
   @DeleteMapping("/users/{userId}")

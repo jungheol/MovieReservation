@@ -10,7 +10,6 @@ import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto.Request;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.document.SearchMovieRepository;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

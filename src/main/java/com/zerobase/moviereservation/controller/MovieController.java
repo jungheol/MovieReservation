@@ -4,7 +4,6 @@ import com.zerobase.moviereservation.model.document.MovieDocument;
 import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto;
 import com.zerobase.moviereservation.service.MovieService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,8 @@ public class MovieController {
   public RegisterMovieDto.Response register(
       @RequestBody RegisterMovieDto.Request request
   ) {
-    return RegisterMovieDto.Response.from(this.movieService.registerMovie(request));
+    return RegisterMovieDto.Response.from(
+        this.movieService.registerMovie(request));
   }
 
   @GetMapping("/{movieId}")

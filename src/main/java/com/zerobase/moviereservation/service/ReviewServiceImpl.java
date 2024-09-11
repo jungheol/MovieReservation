@@ -121,6 +121,7 @@ public class ReviewServiceImpl implements ReviewService {
     Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
     if (avgRating != null) {
       movie.setRating(avgRating);
+
       movieRepository.save(movie);
     }
   }

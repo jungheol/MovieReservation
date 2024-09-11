@@ -5,7 +5,6 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.PAYMENT_FAI
 import com.zerobase.moviereservation.entity.Payment;
 import com.zerobase.moviereservation.entity.Reservation;
 import com.zerobase.moviereservation.exception.CustomException;
-import com.zerobase.moviereservation.exception.type.ErrorCode;
 import com.zerobase.moviereservation.model.type.PaymentType;
 import com.zerobase.moviereservation.repository.PaymentRepository;
 import lombok.AllArgsConstructor;
@@ -26,12 +25,10 @@ public class PaymentServiceImpl implements PaymentService {
       throw new CustomException(PAYMENT_FAILED);
     }
 
-    Payment payment = Payment.builder()
+    return paymentRepository.save(Payment.builder()
         .reservation(reservation)
         .amount(amount)
         .status(PaymentType.S)
-        .build();
-
-    return paymentRepository.save(payment);
+        .build());
   }
 }

@@ -5,5 +5,5 @@ import com.zerobase.moviereservation.entity.Reservation;
 
 public interface PaymentService {
 
-  public Payment processPayment(Reservation reservation, Integer amount);
+  Payment processPayment(Reservation reservation, Integer amount);
 }

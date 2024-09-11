@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,15 +22,20 @@ public class TheaterController {
   private final TheaterService theaterService;
 
   @PostMapping
-  public RegisterTheaterDto.Response register(@RequestBody RegisterTheaterDto.Request request) {
-    return RegisterTheaterDto.Response.from(this.theaterService.registerTheater(request));
+  public RegisterTheaterDto.Response register(
+      @RequestBody RegisterTheaterDto.Request request
+  ) {
+    return RegisterTheaterDto.Response.from(
+        this.theaterService.registerTheater(request));
   }
 
   @PutMapping("/{theaterId}")
   public UpdateTheaterDto.Response updateTheater(
       @PathVariable("theaterId") Long theaterId,
-      @RequestBody @Valid UpdateTheaterDto.Request request) {
-    return UpdateTheaterDto.Response.from(this.theaterService.updateTheater(theaterId, request));
+      @RequestBody @Valid UpdateTheaterDto.Request request
+  ) {
+    return UpdateTheaterDto.Response.from(
+        this.theaterService.updateTheater(theaterId, request));
   }
 
   @DeleteMapping("/{theaterId}")
