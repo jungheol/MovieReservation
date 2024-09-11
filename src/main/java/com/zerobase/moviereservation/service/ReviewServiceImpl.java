@@ -42,33 +42,20 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReservationRepository reservationRepository;
   private final ReviewRepository reviewRepository;
   private final MovieRepository movieRepository;
+  private final AuthenticationService authenticationService;
 
   @Override
   @Transactional
   public ReviewDto registerReview(Long userId, Long reservationId, Request request) {
-    UserDetails userDetails = (UserDetails) SecurityContextHolder
-        .getContext()
-        .getAuthentication()
-        .getPrincipal();
-
-    User authenticatedUser = userRepository.findByEmail(userDetails.getUsername())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-    // 인증된 사용자의 userId와 요청된 userId가 다를 경우 예외 발생
-    if (!authenticatedUser.getId().equals(userId)) {
-      throw new CustomException(AUTHORIZATION_ERROR);
-    }
-
-    User user = this.userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    User authuser = authenticationService.getAuthenticatedUser(userId);
 
     Reservation reservation = this.reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(RESERVATION_NOT_FOUND));
 
-    validationRegisterReview(user, reservation, request);
+    validationRegisterReview(authuser, reservation, request);
 
     Review review = this.reviewRepository.save(Review.builder()
-        .user(user)
+        .user(authuser)
         .reservation(reservation)
         .content(request.getContent())
         .rating(request.getRating())
@@ -127,26 +114,12 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   @Transactional
   public ReviewDto updateReview(Long userId, Long reviewId, UpdateReviewDto.Request request) {
-    UserDetails userDetails = (UserDetails) SecurityContextHolder
-        .getContext()
-        .getAuthentication()
-        .getPrincipal();
-
-    User authenticatedUser = userRepository.findByEmail(userDetails.getUsername())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-    // 인증된 사용자의 userId와 요청된 userId가 다를 경우 예외 발생
-    if (!authenticatedUser.getId().equals(userId)) {
-      throw new CustomException(AUTHORIZATION_ERROR);
-    }
-
-    User user = this.userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    User authuser = authenticationService.getAuthenticatedUser(userId);
 
     Review review = this.reviewRepository.findById(reviewId)
         .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
-    validationUpdateReview(user, review, request);
+    validationUpdateReview(authuser, review, request);
 
     if (request.getContent() != null) {
       review.setContent(request.getContent());
@@ -169,8 +142,7 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Override
   public List<ReviewDto> getAllReview(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    authenticationService.getAuthenticatedUser(userId);
 
     List<Review> reviews = reviewRepository.findAllByUserId(userId);
 
@@ -204,26 +176,10 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   @Transactional
   public void deleteReview(Long userId, Long reviewId) {
-    UserDetails userDetails = (UserDetails) SecurityContextHolder
-        .getContext()
-        .getAuthentication()
-        .getPrincipal();
-
-    User authenticatedUser = userRepository.findByEmail(userDetails.getUsername())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-    // 인증된 사용자의 userId와 요청된 userId가 다를 경우 예외 발생
-    if (!authenticatedUser.getId().equals(userId)) {
-      throw new CustomException(AUTHORIZATION_ERROR);
-    }
+    authenticationService.getAuthenticatedUser(userId);
 
     Review review = this.reviewRepository.findById(reviewId)
         .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
-
-    // 리뷰 작성자와 리뷰 삭제자의 userId가 다를 때
-    if (!review.getUser().getId().equals(userId)) {
-      throw new CustomException(REVIEW_USER_NOT_MATCHED);
-    }
 
     this.reviewRepository.delete(review);
 
