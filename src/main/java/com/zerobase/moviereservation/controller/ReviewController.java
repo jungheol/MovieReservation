@@ -4,8 +4,8 @@ import com.zerobase.moviereservation.model.dto.RegisterReviewDto;
 import com.zerobase.moviereservation.model.dto.ReviewDto;
 import com.zerobase.moviereservation.model.dto.UpdateReviewDto;
 import com.zerobase.moviereservation.service.ReviewService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,10 +45,12 @@ public class ReviewController {
   }
 
   @GetMapping("/users/{userId}")
-  public List<ReviewDto> getAllReview(
-      @PathVariable("userId") Long userId
+  public Page<ReviewDto> getAllReview(
+      @PathVariable("userId") Long userId,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "5") int size
   ) {
-    return reviewService.getAllReview(userId);
+    return reviewService.getAllReview(userId, page, size);
   }
 
   @DeleteMapping("/{reviewId}")

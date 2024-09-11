@@ -23,9 +23,10 @@ import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ReviewRepository;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,18 +83,18 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public List<ReviewDto> getAllReview(Long userId) {
+  public Page<ReviewDto> getAllReview(Long userId, int page, int size) {
     authenticationService.getAuthenticatedUser(userId);
 
-    List<Review> reviews = reviewRepository.findAllByUserId(userId);
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<Review> reviews = reviewRepository.findAllByUserId(userId, pageable);
 
     if (reviews.isEmpty()) {
       throw new CustomException(REVIEW_NOT_FOUND);
     }
 
-    return reviews.stream()
-        .map(ReviewDto::fromEntity)
-        .collect(Collectors.toList());
+    return reviews.map(ReviewDto::fromEntity);
   }
 
   @Override

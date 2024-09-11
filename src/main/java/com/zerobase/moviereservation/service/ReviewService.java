@@ -3,7 +3,7 @@ package com.zerobase.moviereservation.service;
 import com.zerobase.moviereservation.model.dto.RegisterReviewDto;
 import com.zerobase.moviereservation.model.dto.ReviewDto;
 import com.zerobase.moviereservation.model.dto.UpdateReviewDto;
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ReviewService {
 
@@ -11,7 +11,7 @@ public interface ReviewService {
 
   ReviewDto updateReview(Long userId, Long reviewId, UpdateReviewDto.Request request);
 
-  public List<ReviewDto> getAllReview(Long userId);
+  Page<ReviewDto> getAllReview(Long userId, int page, int size);
 
   void deleteReview(Long userId, Long reviewId);
 }
