@@ -1,6 +1,5 @@
 package com.zerobase.moviereservation.service;
 
-import static com.zerobase.moviereservation.exception.type.ErrorCode.AUTHORIZATION_ERROR;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_ALREADY_EXIST;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_NOT_AVAILABLE;
@@ -8,7 +7,6 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_NOT_
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_RATING_OUT_OF_RANGE;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_TOO_LONG;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_USER_NOT_MATCHED;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.moviereservation.entity.Movie;
 import com.zerobase.moviereservation.entity.Reservation;
@@ -24,13 +22,10 @@ import com.zerobase.moviereservation.model.type.CancelType;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ReviewRepository;
-import com.zerobase.moviereservation.repository.UserRepository;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
-  private final UserRepository userRepository;
   private final ReservationRepository reservationRepository;
   private final ReviewRepository reviewRepository;
   private final MovieRepository movieRepository;
@@ -54,22 +48,73 @@ public class ReviewServiceImpl implements ReviewService {
 
     validationRegisterReview(authuser, reservation, request);
 
-    Review review = this.reviewRepository.save(Review.builder()
+    updateMovieRating(reservation.getSchedule().getMovie());
+
+    return ReviewDto.fromEntity(this.reviewRepository.save(Review.builder()
         .user(authuser)
         .reservation(reservation)
         .content(request.getContent())
         .rating(request.getRating())
-        .build());
+        .build()));
+  }
 
-    Movie movie = reservation.getSchedule().getMovie();
+  @Override
+  @Transactional
+  public ReviewDto updateReview(Long userId, Long reviewId, UpdateReviewDto.Request request) {
+    User authuser = authenticationService.getAuthenticatedUser(userId);
+
+    Review review = this.reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+    validationUpdateReview(authuser, review, request);
+
+    if (request.getContent() != null) {
+      review.setContent(request.getContent());
+    }
+
+    if (request.getRating() != null) {
+      review.setRating(request.getRating());
+    }
+
+    updateMovieRating(review.getReservation().getSchedule().getMovie());
+
+    return ReviewDto.fromEntity(this.reviewRepository.save(review));
+  }
+
+  @Override
+  public List<ReviewDto> getAllReview(Long userId) {
+    authenticationService.getAuthenticatedUser(userId);
+
+    List<Review> reviews = reviewRepository.findAllByUserId(userId);
+
+    if (reviews.isEmpty()) {
+      throw new CustomException(REVIEW_NOT_FOUND);
+    }
+
+    return reviews.stream()
+        .map(ReviewDto::fromEntity)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  @Transactional
+  public void deleteReview(Long userId, Long reviewId) {
+    authenticationService.getAuthenticatedUser(userId);
+
+    Review review = this.reviewRepository.findById(reviewId)
+        .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+    this.reviewRepository.delete(review);
+
+    updateMovieRating(review.getReservation().getSchedule().getMovie());
+  }
+
+  private void updateMovieRating(Movie movie) {
     Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
-
     if (avgRating != null) {
       movie.setRating(avgRating);
       movieRepository.save(movie);
     }
-
-    return ReviewDto.fromEntity(review);
   }
 
   private void validationRegisterReview(User user, Reservation reservation,
@@ -111,50 +156,6 @@ public class ReviewServiceImpl implements ReviewService {
     return startTime.plusMinutes(runningTime);
   }
 
-  @Override
-  @Transactional
-  public ReviewDto updateReview(Long userId, Long reviewId, UpdateReviewDto.Request request) {
-    User authuser = authenticationService.getAuthenticatedUser(userId);
-
-    Review review = this.reviewRepository.findById(reviewId)
-        .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
-
-    validationUpdateReview(authuser, review, request);
-
-    if (request.getContent() != null) {
-      review.setContent(request.getContent());
-    }
-
-    if (request.getRating() != null) {
-      review.setRating(request.getRating());
-    }
-
-    Movie movie = review.getReservation().getSchedule().getMovie();
-    Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
-
-    if (avgRating != null) {
-      movie.setRating(avgRating);
-      movieRepository.save(movie);
-    }
-
-    return ReviewDto.fromEntity(this.reviewRepository.save(review));
-  }
-
-  @Override
-  public List<ReviewDto> getAllReview(Long userId) {
-    authenticationService.getAuthenticatedUser(userId);
-
-    List<Review> reviews = reviewRepository.findAllByUserId(userId);
-
-    if (reviews.isEmpty()) {
-      throw new CustomException(REVIEW_NOT_FOUND);
-    }
-
-    return reviews.stream()
-        .map(ReviewDto::fromEntity)
-        .collect(Collectors.toList());
-  }
-
   private void validationUpdateReview(User user, Review review,
       UpdateReviewDto.Request request) {
     // 리뷰의 평점이 입력 범위를 벗어났을 때
@@ -170,25 +171,6 @@ public class ReviewServiceImpl implements ReviewService {
     // 리뷰 작성자와 리뷰 변경자의 userId가 다를 때
     if (!review.getUser().getId().equals(user.getId())) {
       throw new CustomException(REVIEW_USER_NOT_MATCHED);
-    }
-  }
-
-  @Override
-  @Transactional
-  public void deleteReview(Long userId, Long reviewId) {
-    authenticationService.getAuthenticatedUser(userId);
-
-    Review review = this.reviewRepository.findById(reviewId)
-        .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
-
-    this.reviewRepository.delete(review);
-
-    Movie movie = review.getReservation().getSchedule().getMovie();
-    Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
-
-    if (avgRating != null) {
-      movie.setRating(avgRating);
-      movieRepository.save(movie);
     }
   }
 }
