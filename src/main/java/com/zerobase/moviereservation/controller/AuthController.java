@@ -46,18 +46,18 @@ public class AuthController {
     );
   }
 
-  @PutMapping("/users/{id}")
+  @PutMapping("/users/{userId}")
   public UpdateUserDto.Response updateUser(
-      @PathVariable("id") Long userId,
+      @PathVariable("userId") Long userId,
       @RequestBody @Valid UpdateUserDto.Request request) {
     return UpdateUserDto.Response.from(this.authService.updateUser(userId, request));
   }
 
-  @DeleteMapping("/{email}")
+  @DeleteMapping("/users/{userId}")
   public ResponseEntity<?> deleteUser(
-      @PathVariable("email") String email
+      @PathVariable("userId") Long userId
   ) {
-    this.authService.deleteUser(email);
+    this.authService.deleteUser(userId);
     return ResponseEntity.ok("유저 정보가 삭제되었습니다.");
   }
 }

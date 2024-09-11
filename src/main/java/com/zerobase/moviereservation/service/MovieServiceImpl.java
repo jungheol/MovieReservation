@@ -36,7 +36,7 @@ public class MovieServiceImpl implements MovieService {
         .title(request.getTitle())
         .director(request.getDirector())
         .genre(request.getGenre())
-        .runningTime(request.getRunningTime())
+        .runningMinute(request.getRunningMinute())
         .releaseDate(request.getReleaseDate())
         .build());
 
@@ -74,7 +74,7 @@ public class MovieServiceImpl implements MovieService {
     movieDocument.setTitle(movie.getTitle());
     movieDocument.setDirector(movie.getDirector());
     movieDocument.setGenre(movie.getGenre());
-    movieDocument.setRunningTime(movie.getRunningTime());
+    movieDocument.setRunningMinute(movie.getRunningMinute());
     movieDocument.setReleaseDate(movie.getReleaseDate());
 
     return searchMovieRepository.save(movieDocument);

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   private final UserRepository userRepository;
+  private final AuthenticationService authenticationService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
@@ -61,26 +62,24 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public UserDto updateUser(Long userId, UpdateUserDto.Request request) {
-    User user = this.userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    User authUser = authenticationService.getAuthenticatedUser(userId);
 
     request.setPassword(this.passwordEncoder.encode(request.getPassword()));
 
-    user.setPassword(request.getPassword());
-    user.setUsername(request.getUsername());
-    user.setBirthday(request.getBirthday());
-    user.setPhoneNumber(request.getPhoneNumber());
+    authUser.setPassword(request.getPassword());
+    authUser.setUsername(request.getUsername());
+    authUser.setBirthday(request.getBirthday());
+    authUser.setPhoneNumber(request.getPhoneNumber());
 
-    return UserDto.fromEntity(user);
+    return UserDto.fromEntity(authUser);
   }
 
   @Override
   @Transactional
-  public void deleteUser(String email) {
-    User user = this.userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  public void deleteUser(Long userId) {
+    User authUser = authenticationService.getAuthenticatedUser(userId);
 
-    this.userRepository.delete(user);
+    this.userRepository.delete(authUser);
   }
 
   @Override

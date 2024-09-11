@@ -4,12 +4,10 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_CAN
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_RESERVATION;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_SCHEDULE;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_RESERVED_SEAT;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.AUTHORIZATION_ERROR;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.PAYMENT_FAILED;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SEAT_NOT_VALID;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.moviereservation.entity.Payment;
 import com.zerobase.moviereservation.entity.Reservation;
@@ -30,8 +28,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,28 +41,12 @@ public class ReservationServiceImpl implements ReservationService {
   private final SeatRepository seatRepository;
   private final RedisLockService redisLockService;
   private final PaymentService paymentService;
+  private final AuthenticationService authenticationService;
 
   @Override
   @Transactional
   public List<ReservationDto> registerReservation(Request request) {
-    // 인증된 사용자의 이메일 가져오기
-    UserDetails userDetails = (UserDetails) SecurityContextHolder
-        .getContext()
-        .getAuthentication()
-        .getPrincipal();
-
-    User user = userRepository.findByEmail(userDetails.getUsername())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-    Long authenticatedUserId = user.getId();
-
-    // 예약하려는 userId와 인증된 사용자의 userId가 다를 경우 예외 발생
-    if (!authenticatedUserId.equals(request.getUserId())) {
-      throw new CustomException(AUTHORIZATION_ERROR);
-    }
-
-    user = userRepository.findById(request.getUserId())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    User authuser = authenticationService.getAuthenticatedUser(request.getUserId());
 
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
@@ -96,7 +76,7 @@ public class ReservationServiceImpl implements ReservationService {
       }
 
       Reservation reservation = this.reservationRepository.save(Reservation.builder()
-          .user(user)
+          .user(authuser)
           .schedule(schedule)
           .seats(seats)
           .cancel(CancelType.N)
@@ -127,13 +107,10 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public ReservationDto canceledReservation(Long userId, Long reservationId) {
+    authenticationService.getAuthenticatedUser(userId);
+
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(RESERVATION_NOT_FOUND));
-
-    // 예약자와 예약내용이 일치하지 않을 때
-    if (!reservation.getUser().getId().equals(userId)) {
-      throw new CustomException(AUTHORIZATION_ERROR);
-    }
 
     // 이미 취소된 예약인 경우
     if (CancelType.Y.equals(reservation.getCancel())) {
@@ -150,8 +127,7 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   public List<ReservationDto> getAllReservation(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    authenticationService.getAuthenticatedUser(userId);
 
     List<Reservation> reservations = reservationRepository.findByUserId(userId);
 

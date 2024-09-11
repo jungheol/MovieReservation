@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authorizeHttpRequests(
-            authorizeRequests -> authorizeRequests.requestMatchers("/auth/**", "/reservations/**", "/seats/**").permitAll()
+            authorizeRequests -> authorizeRequests.requestMatchers("/auth/**", "/reservations/**", "/seats/**", "/reviews/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/movies/**").hasRole("USER")
                 .requestMatchers(HttpMethod.GET, "/schedules/**").hasRole("USER")
                 .requestMatchers("/theaters/**").hasRole("OWNER")
