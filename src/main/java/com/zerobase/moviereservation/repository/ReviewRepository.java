@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-  @Query("SELECT AVG(r.rating) FROM Review r WHERE r.reservation.schedule.movie.id = :movieId")
+  @Query("SELECT AVG(r.rating) FROM Review r WHERE r.movie.id = :movieId")
   Double findAverageRatingByMovieId(@Param("movieId") Long movieId);
 
   boolean existsByReservationId(Long reservationId);
