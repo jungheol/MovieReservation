@@ -4,8 +4,6 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_ALREADY_EXIST;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_NOT_AVAILABLE;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_NOT_FOUND;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_RATING_OUT_OF_RANGE;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_TOO_LONG;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.REVIEW_USER_NOT_MATCHED;
 
 import com.zerobase.moviereservation.entity.Movie;
@@ -50,11 +48,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     validationRegisterReview(authuser, reservation, request);
 
-    updateMovieRating(reservation.getSchedule().getMovie());
+    Movie movie = reservation.getSchedule().getMovie();
+
+    updateMovieRating(movie);
 
     return ReviewDto.fromEntity(this.reviewRepository.save(Review.builder()
         .user(authuser)
         .reservation(reservation)
+        .movie(movie)
         .content(request.getContent())
         .rating(request.getRating())
         .build()));
@@ -78,7 +79,7 @@ public class ReviewServiceImpl implements ReviewService {
       review.setRating(request.getRating());
     }
 
-    updateMovieRating(review.getReservation().getSchedule().getMovie());
+    updateMovieRating(review.getMovie());
 
     return ReviewDto.fromEntity(this.reviewRepository.save(review));
   }
@@ -108,10 +109,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     this.reviewRepository.delete(review);
 
-    updateMovieRating(review.getReservation().getSchedule().getMovie());
+    updateMovieRating(review.getMovie());
   }
 
   private void updateMovieRating(Movie movie) {
+    // 추후 lock 적용하기
     Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
     if (avgRating != null) {
       movie.setRating(avgRating);

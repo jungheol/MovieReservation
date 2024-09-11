@@ -35,6 +35,10 @@ public class Review extends BaseTimeEntity {
   @JoinColumn(name = "reservation_id")
   private Reservation reservation;
 
+  @ManyToOne
+  @JoinColumn(name = "movie_id")
+  private Movie movie;
+
   @Column(length = 250)
   private String content;
 

@@ -24,7 +24,7 @@ public class ReviewDto {
     return ReviewDto.builder()
         .id(review.getId())
         .username(review.getUser().getUsername())
-        .movieTitle(review.getReservation().getSchedule().getMovie().getTitle())
+        .movieTitle(review.getMovie().getTitle())
         .content(review.getContent())
         .rating(review.getRating())
         .build();
