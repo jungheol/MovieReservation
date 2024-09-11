@@ -50,15 +50,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     Movie movie = reservation.getSchedule().getMovie();
 
-    updateMovieRating(movie);
-
-    return ReviewDto.fromEntity(this.reviewRepository.save(Review.builder()
+    // review table 에 우선 저장
+    Review review = this.reviewRepository.save(Review.builder()
         .user(authuser)
         .reservation(reservation)
         .movie(movie)
         .content(request.getContent())
         .rating(request.getRating())
-        .build()));
+        .build());
+
+    // review table 의 정보로 avgRating 구한 후 movie table 에 저장
+    updateMovieRating(movie);
+
+    return ReviewDto.fromEntity(review);
   }
 
   @Override
@@ -121,9 +125,10 @@ public class ReviewServiceImpl implements ReviewService {
     Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
     if (avgRating != null) {
       movie.setRating(avgRating);
-
-      movieRepository.save(movie);
+    } else { // null 일 때 == 해당 영화 리뷰가 (삭제되어) 하나도 없을 때
+      movie.setRating(0.0);
     }
+    movieRepository.save(movie);
   }
 
   private void validationRegisterReview(User user, Reservation reservation,
