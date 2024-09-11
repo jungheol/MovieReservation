@@ -22,6 +22,7 @@ import com.zerobase.moviereservation.model.type.CancelType;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ReviewRepository;
+import jakarta.validation.Valid;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Override
   @Transactional
-  public ReviewDto registerReview(Long userId, Long reservationId, Request request) {
+  public ReviewDto registerReview(Long userId, Long reservationId, @Valid Request request) {
     User authuser = authenticationService.getAuthenticatedUser(userId);
 
     Reservation reservation = this.reservationRepository.findById(reservationId)
@@ -61,13 +62,13 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Override
   @Transactional
-  public ReviewDto updateReview(Long userId, Long reviewId, UpdateReviewDto.Request request) {
+  public ReviewDto updateReview(Long userId, Long reviewId, @Valid UpdateReviewDto.Request request) {
     User authuser = authenticationService.getAuthenticatedUser(userId);
 
     Review review = this.reviewRepository.findById(reviewId)
         .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
-    validationUpdateReview(authuser, review, request);
+    validationUpdateReview(authuser, review);
 
     if (request.getContent() != null) {
       review.setContent(request.getContent());
@@ -120,16 +121,6 @@ public class ReviewServiceImpl implements ReviewService {
 
   private void validationRegisterReview(User user, Reservation reservation,
       RegisterReviewDto.Request request) {
-    // 리뷰의 평점이 입력 범위를 벗어났을 때
-    if (request.getRating() > 5 || request.getRating() < 0) {
-      throw new CustomException(REVIEW_RATING_OUT_OF_RANGE);
-    }
-
-    // 리뷰 내용이 정해진 분량보다 더 클 때
-    if (request.getContent().length() > 80) {
-      throw new CustomException(REVIEW_TOO_LONG);
-    }
-
     // 리뷰 작성자와 예약자의 userId가 다를 때
     if (!reservation.getUser().getId().equals(user.getId())) {
       throw new CustomException(REVIEW_USER_NOT_MATCHED);
@@ -157,18 +148,7 @@ public class ReviewServiceImpl implements ReviewService {
     return startTime.plusMinutes(runningTime);
   }
 
-  private void validationUpdateReview(User user, Review review,
-      UpdateReviewDto.Request request) {
-    // 리뷰의 평점이 입력 범위를 벗어났을 때
-    if (request.getRating() != null && (request.getRating() > 5 || request.getRating() < 0)) {
-      throw new CustomException(REVIEW_RATING_OUT_OF_RANGE);
-    }
-
-    // 리뷰 내용이 정해진 분량보다 더 클 때
-    if (request.getContent() != null && request.getContent().length() > 80) {
-      throw new CustomException(REVIEW_TOO_LONG);
-    }
-
+  private void validationUpdateReview(User user, Review review) {
     // 리뷰 작성자와 리뷰 변경자의 userId가 다를 때
     if (!review.getUser().getId().equals(user.getId())) {
       throw new CustomException(REVIEW_USER_NOT_MATCHED);
