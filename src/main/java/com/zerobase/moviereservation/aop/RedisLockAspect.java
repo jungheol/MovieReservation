@@ -22,14 +22,14 @@ public class RedisLockAspect {
     String[] lockKeys = redisLock.keys();
     long timeout = redisLock.timeout();
 
-    // 모든 lockKey에 대해 락 시도
-    for (String lockKey : lockKeys) {
-      if (!redisLockService.lock(lockKey, timeout)) {
-        throw new CustomException(ALREADY_LOCKED);
-      }
-    }
-
     try {
+      // 모든 lockKey에 대해 락 시도
+      for (String lockKey : lockKeys) {
+        if (!redisLockService.lock(lockKey, timeout)) {
+          throw new CustomException(ALREADY_LOCKED);
+        }
+      }
+
       // 메서드 실행
       return joinPoint.proceed();
     } finally {
