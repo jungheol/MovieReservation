@@ -47,8 +47,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   @RedisLock(keys = {
-      "seat_lock:" + "#request.seatIds",
-      "schedule_lock:" + "#request.scheduleId"
+      "#request.seatIds.?[true].![\"seat_lock:\" + #this + ':schedule_lock:' + #request.scheduleId]"
   })
   public ReservationDto registerReservation(Request request) {
     User authuser = authenticationService.getAuthenticatedUser(request.getUserId());

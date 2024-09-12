@@ -31,7 +31,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
   @Override
   @Transactional
-  @RedisLock(keys = "schedule_lock:#request.theaterId:#request.startTime")
+  @RedisLock(keys = {"'schedule_lock:' + #request.theaterId + ':' + #request.startTime"})
   public ScheduleDto registerSchedule(Request request) {
     Movie movie = this.movieRepository.findById(request.getMovieId())
         .orElseThrow(() -> new CustomException(ErrorCode.MOVIE_NOT_FOUND));

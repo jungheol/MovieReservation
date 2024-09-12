@@ -18,7 +18,7 @@ public class MovieRatingService {
   private final ReviewRepository reviewRepository;
   private final SearchMovieRepository searchMovieRepository;
 
-  @RedisLock(keys = "movie_lock:#movie.id")
+  @RedisLock(keys = "'movie_lock:' + #movie.id")
   public void updateMovieRating(Movie movie) {
     Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
     if (avgRating != null) {
