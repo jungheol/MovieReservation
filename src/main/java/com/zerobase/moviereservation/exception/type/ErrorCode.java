@@ -42,7 +42,10 @@ public enum ErrorCode {
   REVIEW_USER_NOT_MATCHED("R_01", "영화 예약자와 리뷰 작성자가 같지 않습니다."),
   REVIEW_ALREADY_EXIST("R_02", "해당 예매에 대한 리뷰가 이미 존재합니다."),
   REVIEW_NOT_AVAILABLE("R_03", "해당 예약건은 리뷰를 쓸 수 있는 상태가 아닙니다."),
-  REVIEW_NOT_FOUND("R_04", "해당 리뷰를 찾을 수 없습니다.");
+  REVIEW_NOT_FOUND("R_04", "해당 리뷰를 찾을 수 없습니다."),
+
+  // lock error
+  ALREADY_LOCKED("L_01", "해당 key는 이미 잠겨있습니다.");
 
   private final String code;
   private final String description;

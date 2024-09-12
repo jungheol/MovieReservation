@@ -9,6 +9,7 @@ import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SEAT_NOT_VALID;
 
+import com.zerobase.moviereservation.aop.RedisLock;
 import com.zerobase.moviereservation.entity.Payment;
 import com.zerobase.moviereservation.entity.Reservation;
 import com.zerobase.moviereservation.entity.Schedule;
@@ -45,58 +46,41 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
+  @RedisLock(keys = {
+      "#request.seatIds.?[true].![\"seat_lock:\" + #this + ':schedule_lock:' + #request.scheduleId]"
+  })
   public ReservationDto registerReservation(Request request) {
     User authuser = authenticationService.getAuthenticatedUser(request.getUserId());
 
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
-    for (Long seatId : request.getSeatIds()) {
-      String seatLockKey = "seat_lock:" + seatId;
-      if (!redisLockService.lock(seatLockKey, 10)) {
-        throw new CustomException(ALREADY_RESERVED_SEAT);
-      }
+    // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
+    if (this.reservationRepository.findByScheduleIdAndSeatsIdIn(schedule.getId(),
+        request.getSeatIds()).stream().anyMatch(r -> CancelType.N.equals(r.getCancel()))) {
+      throw new CustomException(ALREADY_EXISTED_RESERVATION);
     }
 
-    String scheduleLockKey = "schedule_lock:" + schedule.getId();
-    if (!redisLockService.lock(scheduleLockKey, 10)) {
-      throw new CustomException(ALREADY_EXISTED_SCHEDULE);
+    List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
+    if (seats.size() != request.getSeatIds().size()) {
+      throw new CustomException(SEAT_NOT_VALID);
     }
 
-    try {
-      // scheduleId & seatId 가 있고, cancel == "N" 일 때 예외 발생
-      if (this.reservationRepository.findByScheduleIdAndSeatsIdIn(schedule.getId(),
-          request.getSeatIds()).stream().anyMatch(r -> CancelType.N.equals(r.getCancel()))) {
-        throw new CustomException(ALREADY_EXISTED_RESERVATION);
-      }
+    Reservation reservation = this.reservationRepository.save(Reservation.builder()
+        .user(authuser)
+        .schedule(schedule)
+        .seats(seats)
+        .cancel(CancelType.N)
+        .reserved(ReservedType.Y)
+        .build());
 
-      List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
-      if (seats.size() != request.getSeatIds().size()) {
-        throw new CustomException(SEAT_NOT_VALID);
-      }
-
-      Reservation reservation = this.reservationRepository.save(Reservation.builder()
-          .user(authuser)
-          .schedule(schedule)
-          .seats(seats)
-          .cancel(CancelType.N)
-          .reserved(ReservedType.Y)
-          .build());
-
-      Integer amount = calculateAmount(schedule, seats);
-      Payment payment = paymentService.processPayment(reservation, amount);
-      if (!PaymentType.S.equals(payment.getStatus())) {
-        throw new CustomException(PAYMENT_FAILED);
-      }
-
-      return ReservationDto.fromEntity(reservation);
-
-    } finally {
-      for (Long seatId : request.getSeatIds()) {
-        redisLockService.unlock("seat_lock:" + seatId);
-      }
-      redisLockService.unlock("schedule_lock:" + schedule.getId());
+    Integer amount = calculateAmount(schedule, seats);
+    Payment payment = paymentService.processPayment(reservation, amount);
+    if (!PaymentType.S.equals(payment.getStatus())) {
+      throw new CustomException(PAYMENT_FAILED);
     }
+
+    return ReservationDto.fromEntity(reservation);
   }
 
   @Override
