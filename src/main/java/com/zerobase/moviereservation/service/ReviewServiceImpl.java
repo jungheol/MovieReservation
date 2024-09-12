@@ -12,6 +12,7 @@ import com.zerobase.moviereservation.entity.Review;
 import com.zerobase.moviereservation.entity.Schedule;
 import com.zerobase.moviereservation.entity.User;
 import com.zerobase.moviereservation.exception.CustomException;
+import com.zerobase.moviereservation.model.document.MovieDocument;
 import com.zerobase.moviereservation.model.dto.RegisterReviewDto;
 import com.zerobase.moviereservation.model.dto.RegisterReviewDto.Request;
 import com.zerobase.moviereservation.model.dto.ReviewDto;
@@ -20,8 +21,10 @@ import com.zerobase.moviereservation.model.type.CancelType;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ReviewRepository;
+import com.zerobase.moviereservation.repository.document.SearchMovieRepository;
 import jakarta.validation.Valid;
 import java.time.LocalTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository reviewRepository;
   private final MovieRepository movieRepository;
   private final AuthenticationService authenticationService;
+  private final SearchMovieRepository searchMovieRepository;
 
   @Override
   @Transactional
@@ -50,15 +54,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     Movie movie = reservation.getSchedule().getMovie();
 
-    updateMovieRating(movie);
-
-    return ReviewDto.fromEntity(this.reviewRepository.save(Review.builder()
+    // review table 에 우선 저장
+    Review review = this.reviewRepository.save(Review.builder()
         .user(authuser)
         .reservation(reservation)
         .movie(movie)
         .content(request.getContent())
         .rating(request.getRating())
-        .build()));
+        .build());
+
+    // review table 의 정보로 avgRating 구한 후 movie table 에 저장
+    updateMovieRating(movie);
+
+    return ReviewDto.fromEntity(review);
   }
 
   @Override
@@ -121,8 +129,35 @@ public class ReviewServiceImpl implements ReviewService {
     Double avgRating = reviewRepository.findAverageRatingByMovieId(movie.getId());
     if (avgRating != null) {
       movie.setRating(avgRating);
+    } else { // null 일 때 == 해당 영화 리뷰가 (삭제되어) 하나도 없을 때
+      movie.setRating(0.0);
+    }
+    movieRepository.save(movie);
 
-      movieRepository.save(movie);
+    // MovieDocument 에 평균 평점 업데이트
+    updateMovieDocumentRating(movie);
+  }
+
+  private void updateMovieDocumentRating(Movie movie) {
+    Optional<MovieDocument> optionalMovieDocument = searchMovieRepository.findById(movie.getId());
+
+    if (optionalMovieDocument.isPresent()) {
+      MovieDocument movieDocument = optionalMovieDocument.get();
+      movieDocument.setRating(movie.getRating());
+
+      searchMovieRepository.save(movieDocument);
+    } else {
+      MovieDocument newMovieDocument = new MovieDocument(
+          movie.getId(),
+          movie.getTitle(),
+          movie.getDirector(),
+          movie.getGenre(),
+          movie.getRunningMinute(),
+          movie.getReleaseDate(),
+          movie.getRating()
+      );
+
+      searchMovieRepository.save(newMovieDocument);
     }
   }
 

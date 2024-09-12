@@ -15,5 +15,7 @@ public interface MovieService {
 
   Page<MovieDocument> searchMoviesByGenre(String genre, int page, int size);
 
+  Page<MovieDocument> searchMoviesByRating(Double rating, int page, int size);
+
   void deleteMovie(Long movieId);
 }

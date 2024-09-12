@@ -25,8 +25,10 @@ import com.zerobase.moviereservation.repository.ScheduleRepository;
 import com.zerobase.moviereservation.repository.SeatRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
-  public List<ReservationDto> registerReservation(Request request) {
+  public ReservationDto registerReservation(Request request) {
     User authuser = authenticationService.getAuthenticatedUser(request.getUserId());
 
     Schedule schedule = scheduleRepository.findById(request.getScheduleId())
@@ -87,7 +89,7 @@ public class ReservationServiceImpl implements ReservationService {
         throw new CustomException(PAYMENT_FAILED);
       }
 
-      return List.of(ReservationDto.fromEntity(reservation));
+      return ReservationDto.fromEntity(reservation);
 
     } finally {
       for (Long seatId : request.getSeatIds()) {
@@ -119,18 +121,18 @@ public class ReservationServiceImpl implements ReservationService {
   }
 
   @Override
-  public List<ReservationDto> getAllReservation(Long userId) {
+  public Page<ReservationDto> getAllReservation(Long userId, int page, int size) {
     authenticationService.getAuthenticatedUser(userId);
 
-    List<Reservation> reservations = reservationRepository.findByUserId(userId);
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<Reservation> reservations = reservationRepository.findByUserId(userId, pageable);
 
     if (reservations.isEmpty()) {
       throw new CustomException(RESERVATION_NOT_FOUND);
     }
 
-    return reservations.stream()
-        .map(ReservationDto::fromEntity)
-        .collect(Collectors.toList());
+    return reservations.map(ReservationDto::fromEntity);
   }
 
   private Integer calculateAmount(Schedule schedule, List<Seat> seats) {

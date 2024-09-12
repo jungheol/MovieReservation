@@ -3,9 +3,8 @@ package com.zerobase.moviereservation.controller;
 import com.zerobase.moviereservation.model.dto.RegisterReservationDto;
 import com.zerobase.moviereservation.model.dto.ReservationDto;
 import com.zerobase.moviereservation.service.ReservationService;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,12 +23,11 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @PostMapping
-  public ResponseEntity<List<RegisterReservationDto.Response>> registerReservation(
+  public RegisterReservationDto.Response registerReservation(
       @RequestBody RegisterReservationDto.Request request
   ) {
-    return ResponseEntity.ok(reservationService.registerReservation(request)
-        .stream().map(RegisterReservationDto.Response::from)
-        .collect(Collectors.toList()));
+    return RegisterReservationDto.Response.from(
+        reservationService.registerReservation(request));
   }
 
   @PatchMapping("/cancel/{reservationId}")
@@ -42,9 +40,11 @@ public class ReservationController {
   }
 
   @GetMapping("/users/{userId}")
-  public List<ReservationDto> getAllReservation(
-      @PathVariable("userId") Long userId
+  public Page<ReservationDto> getAllReservation(
+      @PathVariable("userId") Long userId,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "5") int size
   ) {
-    return reservationService.getAllReservation(userId);
+    return reservationService.getAllReservation(userId, page, size);
   }
 }

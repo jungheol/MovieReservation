@@ -14,4 +14,6 @@ public interface SearchMovieRepository extends ElasticsearchRepository<MovieDocu
   @Query("{\"match_phrase_prefix\": {\"genre\": \"?0\"}}")
   Page<MovieDocument> findByGenreContaining(String genre, Pageable pageable);
 
+  Page<MovieDocument> findByRatingGreaterThanEqual(Double rating, Pageable pageable);
+
 }
