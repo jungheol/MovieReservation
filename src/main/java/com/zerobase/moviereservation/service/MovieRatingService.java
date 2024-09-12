@@ -34,25 +34,24 @@ public class MovieRatingService {
   }
 
   private void updateMovieDocumentRating(Movie movie) {
-    Optional<MovieDocument> optionalMovieDocument = searchMovieRepository.findById(movie.getId());
-
-    if (optionalMovieDocument.isPresent()) {
-      MovieDocument movieDocument = optionalMovieDocument.get();
-      movieDocument.setRating(movie.getRating());
-
-      searchMovieRepository.save(movieDocument);
-    } else {
-      MovieDocument newMovieDocument = new MovieDocument(
-          movie.getId(),
-          movie.getTitle(),
-          movie.getDirector(),
-          movie.getGenre(),
-          movie.getRunningMinute(),
-          movie.getReleaseDate(),
-          movie.getRating()
-      );
-
-      searchMovieRepository.save(newMovieDocument);
-    }
+    searchMovieRepository.findById(movie.getId())
+        .ifPresentOrElse(
+            movieDocument -> {
+              movieDocument.setRating(movie.getRating());
+              searchMovieRepository.save(movieDocument);
+            },
+            () -> {
+              MovieDocument newMovieDocument = new MovieDocument(
+                  movie.getId(),
+                  movie.getTitle(),
+                  movie.getDirector(),
+                  movie.getGenre(),
+                  movie.getRunningMinute(),
+                  movie.getReleaseDate(),
+                  movie.getRating()
+              );
+              searchMovieRepository.save(newMovieDocument);
+            }
+        );
   }
 }
