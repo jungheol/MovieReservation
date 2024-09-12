@@ -67,6 +67,17 @@ public class MovieServiceImpl implements MovieService {
     return movies;
   }
 
+  public Page<MovieDocument> searchMoviesByRating(Double rating, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<MovieDocument> movies = searchMovieRepository.findByRatingGreaterThanEqual(rating, pageable);
+
+    if (movies.isEmpty()) {
+      throw new CustomException(MOVIE_NOT_FOUND);
+    }
+
+    return movies;
+  }
+
   private MovieDocument saveDocument(Movie movie) {
     MovieDocument movieDocument = new MovieDocument();
     movieDocument.setId(movie.getId());

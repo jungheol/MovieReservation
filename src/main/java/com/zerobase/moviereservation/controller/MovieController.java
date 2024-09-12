@@ -56,6 +56,15 @@ public class MovieController {
     return movieService.searchMoviesByGenre(genre, page, size);
   }
 
+  @GetMapping("/search/rating")
+  public Page<MovieDocument> searchMoviesByRating(
+      @RequestParam("rating") Double rating,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "5") int size
+  ) {
+    return movieService.searchMoviesByRating(rating, page, size);
+  }
+
   @DeleteMapping("/{movieId}")
   public ResponseEntity<?> deleteMovie(
       @PathVariable("movieId") Long movieId

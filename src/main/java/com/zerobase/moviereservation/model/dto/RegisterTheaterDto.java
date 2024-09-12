@@ -15,6 +15,7 @@ public class RegisterTheaterDto {
 
     private String theaterName;
     private String address;
+    @Builder.Default
     private int seatCount = 100;
   }
 
