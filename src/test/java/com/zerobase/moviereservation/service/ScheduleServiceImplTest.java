@@ -65,7 +65,7 @@ class ScheduleServiceImplTest {
     movie.setTitle("Sample Movie");
     movie.setDirector("Sample Director");
     movie.setGenre("Action");
-    movie.setRunningTime("120");
+    movie.setRunningMinute(140);
     movie.setReleaseDate(LocalDate.parse("2024-09-01"));
 
     theater = new Theater();

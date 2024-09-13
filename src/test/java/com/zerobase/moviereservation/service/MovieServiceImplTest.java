@@ -11,9 +11,11 @@ import static org.mockito.Mockito.when;
 
 import com.zerobase.moviereservation.entity.Movie;
 import com.zerobase.moviereservation.exception.CustomException;
+import com.zerobase.moviereservation.model.document.MovieDocument;
 import com.zerobase.moviereservation.model.dto.MovieDto;
 import com.zerobase.moviereservation.model.dto.RegisterMovieDto;
 import com.zerobase.moviereservation.repository.MovieRepository;
+import com.zerobase.moviereservation.repository.document.SearchMovieRepository;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,9 @@ class MovieServiceImplTest {
   @Mock
   private MovieRepository movieRepository;
 
+  @Mock
+  private SearchMovieRepository searchMovieRepository;
+
   @InjectMocks
   private MovieServiceImpl movieServiceImpl;
 
@@ -43,14 +48,14 @@ class MovieServiceImplTest {
     registerMovieDto.setTitle("title1");
     registerMovieDto.setDirector("director1");
     registerMovieDto.setGenre("genre1");
-    registerMovieDto.setRunningTime("runningTime1");
+    registerMovieDto.setRunningMinute(120);
     registerMovieDto.setReleaseDate(LocalDate.parse("2024-09-01"));
 
     movie = Movie.builder()
         .title(registerMovieDto.getTitle())
         .director(registerMovieDto.getDirector())
         .genre(registerMovieDto.getGenre())
-        .runningTime(registerMovieDto.getRunningTime())
+        .runningMinute(registerMovieDto.getRunningMinute())
         .releaseDate(registerMovieDto.getReleaseDate())
         .build();
   }
@@ -70,12 +75,13 @@ class MovieServiceImplTest {
     assertThat(result.getTitle()).isEqualTo(registerMovieDto.getTitle());
     assertThat(result.getDirector()).isEqualTo(registerMovieDto.getDirector());
     assertThat(result.getGenre()).isEqualTo(registerMovieDto.getGenre());
-    assertThat(result.getRunningTime()).isEqualTo(registerMovieDto.getRunningTime());
+    assertThat(result.getRunningMinute()).isEqualTo(registerMovieDto.getRunningMinute());
     assertThat(result.getReleaseDate()).isEqualTo(registerMovieDto.getReleaseDate());
 
     // verify
     verify(movieRepository).existsByTitle(registerMovieDto.getTitle());
     verify(movieRepository).save(any(Movie.class));
+    verify(searchMovieRepository).save(any(MovieDocument.class));
   }
 
   @Test
@@ -106,6 +112,7 @@ class MovieServiceImplTest {
     // verify
     verify(movieRepository).findById(movieId);
     verify(movieRepository).delete(movie);
+    verify(searchMovieRepository).deleteById(movieId);
   }
 
   @Test
