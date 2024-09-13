@@ -40,6 +40,9 @@ class AuthServiceImplTest {
   @Mock
   private PasswordEncoder passwordEncoder;
 
+  @Mock
+  private AuthenticationService authenticationService;
+
   @InjectMocks
   private AuthServiceImpl authServiceImpl;
 
@@ -155,7 +158,8 @@ class AuthServiceImplTest {
 
     // given
     Long userId = 1L;
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    User authUser = new User();
+    when(authenticationService.getAuthenticatedUser(userId)).thenReturn(authUser);
     when(passwordEncoder.encode(any())).thenReturn("newPassword123");
 
     // when
@@ -168,7 +172,7 @@ class AuthServiceImplTest {
     assertEquals("010-0000-1234", userDto.getPhoneNumber());
 
     // verify
-    verify(userRepository).findById(userId);
+    verify(authenticationService).getAuthenticatedUser(userId);
     verify(passwordEncoder).encode(updateDto.getPassword());
   }
 
@@ -177,7 +181,7 @@ class AuthServiceImplTest {
   void testUpdate_Fail() {
     // given
     Long userId = 1L;
-    when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+    when(authenticationService.getAuthenticatedUser(userId)).thenThrow(new CustomException(USER_NOT_FOUND));
 
     // when & then
     CustomException exception = assertThrows(CustomException.class,
@@ -185,21 +189,21 @@ class AuthServiceImplTest {
     assertEquals(USER_NOT_FOUND, exception.getErrorCode());
 
     // verify
-    verify(userRepository).findById(userId);
+    verify(authenticationService).getAuthenticatedUser(userId);
   }
 
   @Test
   @DisplayName("유저 정보 삭제 성공")
   void testDelete_Success() {
     // given
-    String email = "test@example.com";
-    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    Long userId = 1L;
+    when(authenticationService.getAuthenticatedUser(userId)).thenReturn(user);
 
     // when & then
-    authServiceImpl.deleteUser(email);
+    authServiceImpl.deleteUser(userId);
 
     // verify
-    verify(userRepository).findByEmail(email);
+    verify(authenticationService).getAuthenticatedUser(userId);
     verify(userRepository).delete(user);
   }
 
@@ -207,15 +211,15 @@ class AuthServiceImplTest {
   @DisplayName("유저 정보 삭제 실패")
   void testDelete_Fail() {
     // given
-    String email = "failTest@example.com";
-    when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+    Long userId = 2L;
+    when(authenticationService.getAuthenticatedUser(userId)).thenThrow(new CustomException(USER_NOT_FOUND));
 
     // when & then
     CustomException exception = assertThrows(CustomException.class,
-        () -> authServiceImpl.deleteUser(email));
+        () -> authServiceImpl.deleteUser(userId));
     assertEquals(USER_NOT_FOUND, exception.getErrorCode());
 
     // verify
-    verify(userRepository).findByEmail(email);
+    verify(authenticationService).getAuthenticatedUser(userId);
   }
 }
