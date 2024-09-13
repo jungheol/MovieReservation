@@ -14,6 +14,7 @@ import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.model.dto.RegisterTheaterDto;
 import com.zerobase.moviereservation.model.dto.TheaterDto;
 import com.zerobase.moviereservation.model.dto.UpdateTheaterDto;
+import com.zerobase.moviereservation.repository.SeatRepository;
 import com.zerobase.moviereservation.repository.TheaterRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,9 @@ class TheaterServiceImplTest {
 
   @Mock
   private TheaterRepository theaterRepository;
+
+  @Mock
+  private SeatRepository seatRepository;
 
   @InjectMocks
   private TheaterServiceImpl theaterServiceImpl;
