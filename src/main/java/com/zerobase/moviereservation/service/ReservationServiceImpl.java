@@ -2,8 +2,6 @@ package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_CANCELED_RESERVATION;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_RESERVATION;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_SCHEDULE;
-import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_RESERVED_SEAT;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.PAYMENT_FAILED;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
@@ -40,7 +38,6 @@ public class ReservationServiceImpl implements ReservationService {
   private final ReservationRepository reservationRepository;
   private final ScheduleRepository scheduleRepository;
   private final SeatRepository seatRepository;
-  private final RedisLockService redisLockService;
   private final PaymentService paymentService;
   private final AuthenticationService authenticationService;
 
