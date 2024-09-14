@@ -6,7 +6,6 @@ import com.zerobase.moviereservation.model.document.MovieDocument;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ReviewRepository;
 import com.zerobase.moviereservation.repository.document.SearchMovieRepository;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
