@@ -1,7 +1,10 @@
 package com.zerobase.moviereservation.service;
 
+import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
+
 import com.zerobase.moviereservation.entity.Schedule;
 import com.zerobase.moviereservation.entity.Seat;
+import com.zerobase.moviereservation.exception.CustomException;
 import com.zerobase.moviereservation.repository.ReservationRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
 import com.zerobase.moviereservation.repository.SeatRepository;
@@ -24,7 +27,7 @@ public class SeatServiceImpl implements SeatService {
   @Override
   public Map<String, Object> getAvailableSeats(Long scheduleId) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow(() -> new RuntimeException("Schedule not found"));
+        .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
     // 해당 스케줄의 영화관의 모든 좌석을 조회
     List<Seat> allSeats = seatRepository.findByTheaterId(schedule.getTheater().getId());
