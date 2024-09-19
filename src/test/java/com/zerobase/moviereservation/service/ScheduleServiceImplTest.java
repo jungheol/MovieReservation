@@ -96,7 +96,7 @@ class ScheduleServiceImplTest {
     // given
     when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
     when(theaterRepository.findById(1L)).thenReturn(Optional.of(theater));
-    when(scheduleRepository.existsByTheaterIdAndStartTime(theater.getId(),
+    when(scheduleRepository.existsByTheaterIdAndEndTimeGreaterThanEqual(theater.getId(),
         registerScheduleDto.getStartTime())).thenReturn(false);
     when(scheduleRepository.save(any(Schedule.class))).thenReturn(schedule);
 
@@ -112,7 +112,7 @@ class ScheduleServiceImplTest {
     // verify
     verify(movieRepository).findById(registerScheduleDto.getMovieId());
     verify(theaterRepository).findById(registerScheduleDto.getTheaterId());
-    verify(scheduleRepository).existsByTheaterIdAndStartTime(theater.getId(),
+    verify(scheduleRepository).existsByTheaterIdAndEndTimeGreaterThanEqual(theater.getId(),
         registerScheduleDto.getStartTime());
     verify(scheduleRepository).save(any(Schedule.class));
   }
@@ -155,7 +155,7 @@ class ScheduleServiceImplTest {
     // given
     when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
     when(theaterRepository.findById(1L)).thenReturn(Optional.of(theater));
-    when(scheduleRepository.existsByTheaterIdAndStartTime(theater.getId(),
+    when(scheduleRepository.existsByTheaterIdAndEndTimeGreaterThanEqual(theater.getId(),
         registerScheduleDto.getStartTime()))
         .thenReturn(true);
 
@@ -167,7 +167,7 @@ class ScheduleServiceImplTest {
     // verify
     verify(movieRepository).findById(registerScheduleDto.getMovieId());
     verify(theaterRepository).findById(registerScheduleDto.getTheaterId());
-    verify(scheduleRepository).existsByTheaterIdAndStartTime(theater.getId(),
+    verify(scheduleRepository).existsByTheaterIdAndEndTimeGreaterThanEqual(theater.getId(),
         registerScheduleDto.getStartTime());
   }
 
