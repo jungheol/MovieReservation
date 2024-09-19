@@ -43,7 +43,8 @@
         - 1-5점 사이의 평점과 한줄평을 남길 수 있다.
 
 ## ERD
-![최최종](https://github.com/user-attachments/assets/ec2e9e50-c2c3-45f5-8344-e0093a874b44)
+![최최최종](https://github.com/user-attachments/assets/e06139d6-fbf5-4199-a07c-892d27e2ac65)
+
 
 
 
