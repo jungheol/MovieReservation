@@ -19,6 +19,7 @@ public class ScheduleDto {
   private String movieTitle;
   private String theaterName;
   private LocalTime startTime;
+  private LocalTime endTime;
 
   public static ScheduleDto fromEntity(Schedule schedule) {
     return ScheduleDto.builder()
@@ -26,6 +27,7 @@ public class ScheduleDto {
         .movieTitle(schedule.getMovie().getTitle())
         .theaterName(schedule.getTheater().getTheaterName())
         .startTime(schedule.getStartTime())
+        .endTime(schedule.getEndTime())
         .build();
   }
 }

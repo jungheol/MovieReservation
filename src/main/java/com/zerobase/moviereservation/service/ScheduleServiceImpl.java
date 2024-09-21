@@ -1,7 +1,9 @@
 package com.zerobase.moviereservation.service;
 
 import static com.zerobase.moviereservation.exception.type.ErrorCode.ALREADY_EXISTED_SCHEDULE;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.MOVIE_NOT_FOUND;
 import static com.zerobase.moviereservation.exception.type.ErrorCode.SCHEDULE_NOT_FOUND;
+import static com.zerobase.moviereservation.exception.type.ErrorCode.THEATER_NOT_FOUND;
 
 import com.zerobase.moviereservation.aop.RedisLock;
 import com.zerobase.moviereservation.entity.Movie;
@@ -15,6 +17,7 @@ import com.zerobase.moviereservation.model.dto.UpdateScheduleDto;
 import com.zerobase.moviereservation.repository.MovieRepository;
 import com.zerobase.moviereservation.repository.ScheduleRepository;
 import com.zerobase.moviereservation.repository.TheaterRepository;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -34,20 +37,24 @@ public class ScheduleServiceImpl implements ScheduleService {
   @RedisLock(keys = {"'schedule_lock:' + #request.theaterId + ':' + #request.startTime"})
   public ScheduleDto registerSchedule(Request request) {
     Movie movie = this.movieRepository.findById(request.getMovieId())
-        .orElseThrow(() -> new CustomException(ErrorCode.MOVIE_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MOVIE_NOT_FOUND));
 
     Theater theater = this.theaterRepository.findById(request.getTheaterId())
-        .orElseThrow(() -> new CustomException(ErrorCode.THEATER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(THEATER_NOT_FOUND));
 
-    if (this.scheduleRepository.existsByTheaterIdAndStartTime(
-        theater.getId(), request.getStartTime())) {
+    LocalTime newStartTime = request.getStartTime();
+    LocalTime newEndTime = newStartTime.plusMinutes(movie.getRunningMinute());
+
+    if (this.scheduleRepository.existsByTheaterIdAndEndTimeGreaterThanEqual(
+        theater.getId(), newStartTime)) {
       throw new CustomException(ALREADY_EXISTED_SCHEDULE);
     }
 
     return ScheduleDto.fromEntity(this.scheduleRepository.save(Schedule.builder()
         .movie(movie)
         .theater(theater)
-        .startTime(request.getStartTime())
+        .startTime(newStartTime)
+        .endTime(newEndTime)
         .build()));
   }
 
@@ -65,10 +72,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
 
     Movie movie = this.movieRepository.findById(request.getMovieId())
-        .orElseThrow(() -> new CustomException(ErrorCode.MOVIE_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MOVIE_NOT_FOUND));
 
     Theater theater = this.theaterRepository.findById(request.getTheaterId())
-        .orElseThrow(() -> new CustomException(ErrorCode.THEATER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(THEATER_NOT_FOUND));
 
     if (this.scheduleRepository.existsByTheaterAndStartTimeAndIdNot(
         theater, request.getStartTime(), scheduleId)) {

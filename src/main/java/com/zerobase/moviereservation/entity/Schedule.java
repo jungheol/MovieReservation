@@ -37,7 +37,13 @@ public class Schedule extends BaseTimeEntity {
 
   private LocalTime startTime;
 
+  private LocalTime endTime;
+
   public Integer getPricePerSeat() {
     return 10000;
+  }
+
+  public void calculateEndTime() {
+    this.endTime = this.startTime.plusMinutes(movie.getRunningMinute());
   }
 }

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-  boolean existsByTheaterIdAndStartTime(Long theaterId, LocalTime startTime);
+  boolean existsByTheaterIdAndEndTimeGreaterThanEqual(Long theaterId, LocalTime newStartTime);
+
 
   boolean existsByTheaterAndStartTimeAndIdNot(Theater theater, LocalTime startTime, Long scheduleId);
 

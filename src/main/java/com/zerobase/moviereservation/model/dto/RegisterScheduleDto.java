@@ -28,12 +28,14 @@ public class RegisterScheduleDto {
     private String movieTitle;
     private String theaterName;
     private LocalTime startTime;
+    private LocalTime endTime;
 
     public static Response from(ScheduleDto scheduleDto) {
       return Response.builder()
           .movieTitle(scheduleDto.getMovieTitle())
           .theaterName(scheduleDto.getTheaterName())
           .startTime(scheduleDto.getStartTime())
+          .endTime(scheduleDto.getEndTime())
           .build();
     }
   }
